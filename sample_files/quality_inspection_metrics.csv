@@ -1,0 +1,11 @@
+date,line,product,lot_id,shift,inspected_count,defect_count,defect_rate,main_defect,root_cause,action_owner,recommended_action
+2026-06-10,A,Motor Bracket,LOT-A-2401,day,1200,14,0.0117,scratch,작업대 보호필름 마모,품질A,보호필름 교체 후 2시간 단위 외관 샘플링
+2026-06-10,B,Motor Bracket,LOT-B-2402,night,980,7,0.0071,burr,버 제거 공정 안정,생산B,현 기준 유지
+2026-06-11,A,Sensor Cap,LOT-A-2403,day,1500,27,0.0180,dimension,치수 보정값 drift,설비A,치수 보정값 재설정 및 첫물 검사 강화
+2026-06-11,C,Sensor Cap,LOT-C-2404,night,1100,22,0.0200,contamination,세척조 필터 교체 지연,생산C,세척조 필터 교체 및 재세척 기준 점검
+2026-06-12,B,Gear Housing,LOT-B-2405,day,1320,12,0.0091,scratch,취급 트레이 혼입,물류B,전용 트레이 라벨 재부착
+2026-06-12,C,Gear Housing,LOT-C-2406,night,1250,35,0.0280,burr,금형 edge 마모,설비C,금형 edge 점검 및 burr 샘플링 100개 추가
+2026-06-13,A,Motor Bracket,LOT-A-2407,night,1180,25,0.0212,scratch,포장 전 완충재 부족,품질A,완충재 투입 기준 재교육
+2026-06-13,C,Sensor Cap,LOT-C-2408,day,1090,31,0.0284,dimension,측정 jig 고정 불량,설비C,jig 고정 볼트 교체 및 MSA 재확인
+2026-06-14,C,Gear Housing,LOT-C-2409,day,1300,42,0.0323,burr,금형 냉각 편차,설비C,냉각수 유량 점검 후 금형 조건 재승인
+2026-06-14,D,Valve Plate,LOT-D-2410,day,1600,9,0.0056,contamination,이물 관리 안정,생산D,현 관리 기준 유지

@@ -1,0 +1,51 @@
+{
+  "request_text": "defect_rate가 높은 lot을 찾아 조치 우선순위를 요약해줘.",
+  "payload": {
+    "source_name": "quality_inspection_metrics",
+    "row_count": 4,
+    "columns": ["date", "line", "product", "lot_id", "defect_rate", "main_defect", "root_cause", "recommended_action"],
+    "preview_rows": [
+      {
+        "date": "2026-06-12",
+        "line": "C",
+        "product": "Gear Housing",
+        "lot_id": "LOT-C-2406",
+        "defect_rate": 0.028,
+        "main_defect": "burr",
+        "root_cause": "금형 edge 마모",
+        "recommended_action": "금형 edge 점검 및 burr 샘플링 100개 추가"
+      },
+      {
+        "date": "2026-06-13",
+        "line": "C",
+        "product": "Sensor Cap",
+        "lot_id": "LOT-C-2408",
+        "defect_rate": 0.0284,
+        "main_defect": "dimension",
+        "root_cause": "측정 jig 고정 불량",
+        "recommended_action": "jig 고정 볼트 교체 및 MSA 재확인"
+      },
+      {
+        "date": "2026-06-14",
+        "line": "C",
+        "product": "Gear Housing",
+        "lot_id": "LOT-C-2409",
+        "defect_rate": 0.0323,
+        "main_defect": "burr",
+        "root_cause": "금형 냉각 편차",
+        "recommended_action": "냉각수 유량 점검 후 금형 조건 재승인"
+      },
+      {
+        "date": "2026-06-13",
+        "line": "A",
+        "product": "Motor Bracket",
+        "lot_id": "LOT-A-2407",
+        "defect_rate": 0.0212,
+        "main_defect": "scratch",
+        "root_cause": "포장 전 완충재 부족",
+        "recommended_action": "완충재 투입 기준 재교육"
+      }
+    ]
+  },
+  "expected_answer": "LOT-C-2409가 defect_rate 0.0323으로 가장 높고, LOT-C-2408과 LOT-C-2406도 0.028 이상이다. 우선 C라인 Gear Housing의 금형 냉각 편차와 금형 edge 마모를 점검하고, Sensor Cap은 jig 고정 상태와 MSA를 재확인한다."
+}

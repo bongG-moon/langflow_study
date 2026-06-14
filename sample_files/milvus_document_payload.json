@@ -1,0 +1,35 @@
+{
+  "file_name": "agent_builder_training_deck.pdf",
+  "file_type": "pdf",
+  "document_id": "agent-builder-training-v1",
+  "page_summaries": [
+    {
+      "page": 1,
+      "text": "Agent Builder 교육의 첫 단계는 custom component의 입출력 계약을 이해하는 것이다. Data output은 success, errors, warnings, row_count, columns, preview_rows처럼 downstream이 읽을 수 있는 키를 안정적으로 유지해야 한다."
+    },
+    {
+      "page": 2,
+      "text": "RAG는 문서 적재 flow와 사용자 질문 runtime flow로 분리한다. 문서 적재 flow는 Read File, parser, Split Text, Embedding Model, Milvus ingest_data 연결을 포함한다. 사용자 질문 flow는 Chat Input, query embedding, Milvus search, Prompt Template, Chat Output을 포함한다."
+    },
+    {
+      "page": 3,
+      "text": "Milvus에 저장할 record는 id, text, page_content, metadata를 포함한다. metadata에는 document_id, source_file, page, chunk_index, content_type, modalities, parse_mode, source_locator를 넣어 검색 후 citation을 만들 수 있게 한다."
+    },
+    {
+      "page": 4,
+      "text": "Run Flow가 text input과 message output 중심이면 상위 flow의 Data payload를 JSON 문자열 Message로 감싸 전달한다. 결과는 Parser 또는 Type Convert로 다시 Data로 복원한다."
+    }
+  ],
+  "image_summaries": [
+    {
+      "page": 2,
+      "summary": "다이어그램은 왼쪽의 Load Data Flow와 오른쪽의 Retriever Flow를 분리해서 보여준다. Load Data Flow는 Milvus upsert까지, Retriever Flow는 Chat Output까지 이어진다.",
+      "confidence": 0.93
+    },
+    {
+      "page": 3,
+      "summary": "표는 Milvus record의 주요 field를 id, text, page_content, metadata로 나누어 설명한다.",
+      "confidence": 0.91
+    }
+  ]
+}

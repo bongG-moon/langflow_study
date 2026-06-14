@@ -1,0 +1,103 @@
+{
+  "rows": [
+    {
+      "doc_id": "kb-001",
+      "title": "RAG lifecycle 분리 기준",
+      "category": "rag",
+      "question_hint": "RAG를 왜 두 flow로 나눠야 해?",
+      "content": "사내 Langflow RAG는 하나의 flow로 만들기보다 두 개의 lifecycle로 나누어 운영한다. 문서 적재 flow는 파일 업로드, 파싱, chunk 생성, embedding, Milvus upsert를 담당한다. 사용자 질문 runtime flow는 Chat Input, query embedding, Milvus search, prompt 구성, Chat Output 답변을 담당한다. 이렇게 나누면 문서 재색인과 사용자 응답 장애를 분리해서 배포, 모니터링, 테스트할 수 있다.",
+      "expected_answer": "RAG는 문서 적재 flow와 사용자 질문 runtime flow로 분리하는 것이 좋다. 적재 flow는 업로드/파싱/chunk/embedding/Milvus upsert를 담당하고, runtime flow는 질문/search/prompt/답변을 담당한다.",
+      "source": "agent-builder-study",
+      "section": "RAG",
+      "tags": ["rag", "lifecycle", "milvus"]
+    },
+    {
+      "doc_id": "kb-002",
+      "title": "File Dataset Loader 사용 기준",
+      "category": "custom_component",
+      "question_hint": "File Dataset Loader는 Read File 대신 언제 써?",
+      "content": "Read File은 PDF, DOCX, PPTX 같은 문서를 텍스트나 markdown으로 읽는 범용 노드다. File Dataset Loader는 Read File의 대체품이 아니라 CSV, JSON, JSONL, Markdown, Excel 같은 데이터셋을 row_count, columns, preview_rows, rows, warnings를 가진 사내 표준 Data payload로 정규화하는 adapter다. 데이터셋을 downstream custom component가 같은 방식으로 읽게 해야 할 때 사용한다.",
+      "expected_answer": "Read File은 문서 추출용이고, File Dataset Loader는 CSV/JSON/Excel/Markdown 같은 데이터셋을 표준 Data payload로 정리할 때 쓴다.",
+      "source": "agent-builder-study",
+      "section": "File",
+      "tags": ["file", "dataset", "adapter"]
+    },
+    {
+      "doc_id": "kb-003",
+      "title": "Custom component 출력 계약",
+      "category": "custom_component",
+      "question_hint": "custom component output에는 어떤 공통 필드가 필요해?",
+      "content": "사내 공통 custom component의 Data output은 success, errors, warnings를 기본으로 포함한다. 대용량 결과는 rows 전체보다 row_count, columns, preview_rows, data_ref를 우선 전달한다. 실패 시에는 예외만 던지지 말고 success=false와 errors 배열을 반환해 downstream에서 실패 원인을 읽을 수 있게 한다.",
+      "expected_answer": "기본 output에는 success, errors, warnings를 넣고, 데이터 결과는 row_count, columns, preview_rows, data_ref 중심으로 전달한다.",
+      "source": "agent-builder-study",
+      "section": "Component Contract",
+      "tags": ["output", "data", "errors"]
+    },
+    {
+      "doc_id": "kb-004",
+      "title": "Route Gate inactive branch 처리",
+      "category": "flow_control",
+      "question_hint": "Route Gate에서 선택되지 않은 branch는 어떻게 표시해?",
+      "content": "Route Gate는 group_outputs=True로 여러 branch를 동시에 노출할 수 있다. 선택된 branch만 success=true, active=true로 반환하고, 선택되지 않은 branch는 success=false, active=false, skipped=true로 반환한다. downstream node는 active=true이고 skipped=false인 branch만 처리해야 한다.",
+      "expected_answer": "선택되지 않은 branch는 success=false, active=false, skipped=true로 표시하고 downstream에서는 active=true인 branch만 처리한다.",
+      "source": "agent-builder-study",
+      "section": "Routing",
+      "tags": ["route", "branch", "skipped"]
+    },
+    {
+      "doc_id": "kb-005",
+      "title": "Run Flow payload bridge",
+      "category": "subflow",
+      "question_hint": "Run Flow가 text/message만 받을 때 payload는 어떻게 넘겨?",
+      "content": "하위 Run Flow가 text input과 message output 중심이면 상위 flow의 구조화 Data payload를 JSON 문자열 Message로 감싸 전달한다. Run Flow Payload Adapter는 request_text, payload, contract를 하나의 envelope로 만들고 Message output으로 반환한다. 하위 flow 결과는 Parser, Type Convert, 또는 custom result normalizer로 다시 Data로 복원한다.",
+      "expected_answer": "Data payload를 JSON 문자열 Message로 감싸 Run Flow에 넘기고, 결과는 Parser나 Type Convert로 다시 Data화한다.",
+      "source": "agent-builder-study",
+      "section": "Run Flow",
+      "tags": ["run_flow", "message", "payload"]
+    },
+    {
+      "doc_id": "kb-006",
+      "title": "Milvus 적재 payload 기준",
+      "category": "milvus",
+      "question_hint": "Milvus ingest_data에는 어떤 필드가 들어가?",
+      "content": "Milvus 적재용 record는 id, text, page_content, metadata를 포함한다. metadata에는 document_id, source_file, file_type, page, chunk_index, content_type, modalities, parse_mode, source_locator를 넣는다. Langflow Milvus component에는 embedding, collection_name, connection 정보와 함께 ingest_data를 연결한다.",
+      "expected_answer": "Milvus record에는 id, text/page_content, metadata가 들어가며 metadata에는 document_id, source_file, page, chunk_index, modalities 같은 값이 포함된다.",
+      "source": "agent-builder-study",
+      "section": "Milvus",
+      "tags": ["milvus", "ingest_data", "metadata"]
+    },
+    {
+      "doc_id": "kb-007",
+      "title": "Read File Advanced Parser 연결 기준",
+      "category": "basic_node",
+      "question_hint": "Read File Advanced Parser를 켜면 Parser에 바로 연결하면 돼?",
+      "content": "Read File의 Advanced Parser 토글은 구조화 output과 Markdown output을 만들 수 있게 하는 옵션이다. 파일이 읽혔는지는 Chat Output보다 Read File 노드를 직접 실행한 뒤 Inspect Output에서 먼저 확인한다. Parser의 Data or DataFrame input에 연결하려면 Read File 노드 하단의 output selector에서 Structured Output, Table, JSON 같은 구조화 output을 선택해야 한다. 화면에 텍스트를 보여주려면 내용이 있는 Raw Content 또는 Markdown Message를 Chat Output이나 Prompt Template에 연결한다.",
+      "expected_answer": "Advanced Parser만 켠다고 Parser에 바로 연결되는 것은 아니다. 먼저 Read File 실행 결과를 Inspect Output에서 확인하고, Parser에는 Structured Output/Table/JSON을, 화면 표시나 Prompt에는 내용이 있는 Raw Content/Markdown Message를 연결한다.",
+      "source": "agent-builder-study",
+      "section": "Read File",
+      "tags": ["read_file", "parser", "message"]
+    },
+    {
+      "doc_id": "kb-008",
+      "title": "Read File Advanced Parser 속도 기준",
+      "category": "basic_node",
+      "question_hint": "Advanced Parser standard pipeline이 너무 오래 걸리면 어떻게 해?",
+      "content": "Langflow Desktop의 Read File에서 Advanced Parser를 켜고 Pipeline을 standard로 두면 Docling 기반 고급 문서 처리 경로를 사용한다. standard pipeline에서 OCR Engine이 easyocr이면 페이지를 이미지처럼 분석하므로 텍스트 PDF보다 훨씬 오래 걸릴 수 있다. 초보 실습은 먼저 Advanced Parser를 끄고 Raw Content를 확인한다. 내용이 비어 있으면 Advanced Parser를 켜되 OCR Engine=None으로 Markdown output을 먼저 확인한다. 그래도 스캔본이나 이미지 PDF라 텍스트가 없을 때만 OCR Engine=easyocr을 사용한다.",
+      "expected_answer": "느리면 먼저 Advanced Parser를 끄고 확인하고, 필요할 때만 켠다. 켠 경우에도 OCR Engine=None으로 먼저 Markdown을 확인한 뒤, 스캔/이미지 PDF일 때만 easyocr을 사용한다.",
+      "source": "agent-builder-study",
+      "section": "Read File",
+      "tags": ["read_file", "advanced_parser", "ocr", "performance"]
+    },
+    {
+      "doc_id": "kb-009",
+      "title": "이미지 PDF 처리 우회 기준",
+      "category": "basic_node",
+      "question_hint": "이미지 PDF에서 Job queue not found가 나면 어떻게 읽어?",
+      "content": "이미지 기반 PDF를 Read File의 Advanced Parser와 OCR Engine=easyocr로 통째로 처리하면 오래 걸리고 Langflow Desktop job queue가 끊길 수 있다. 이때는 같은 OCR job을 반복하지 말고 PDF Page Image Extractor로 필요한 페이지만 PNG로 렌더링한다. 생성된 PNG는 Chat Input의 Files에 직접 첨부하거나 Vision Message output으로 vision-capable Language Model에 보낸다. 모델이 만든 page summary text와 page metadata를 Multimodal Milvus Chunk Builder에 넣어 RAG용 chunk로 저장한다.",
+      "expected_answer": "Job queue 오류가 나면 OCR을 반복하지 말고 PDF Page Image Extractor로 page PNG를 만든다. PNG를 Chat Input Files나 Vision Message로 vision 모델에 보내 page summary를 만들고, 그 summary를 Milvus/RAG에 저장한다.",
+      "source": "agent-builder-study",
+      "section": "Image PDF",
+      "tags": ["image_pdf", "vision", "job_queue", "pdf_page_image_extractor"]
+    }
+  ]
+}

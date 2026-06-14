@@ -1,0 +1,138 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R 8 0 R] /Count 3 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 836 >>
+stream
+BT
+/F1 16 Tf
+72 742 Td
+(Langflow Agent Builder RAG Handbook) Tj
+/F1 10 Tf
+0 -22 Td
+(Document ID: pdf-rag-handbook-v2) Tj
+0 -22 Td
+() Tj
+0 -22 Td
+(Section 1. Why RAG has two lifecycles) Tj
+0 -22 Td
+(RAG should be operated as two lifecycles, not as one giant flow.) Tj
+0 -22 Td
+(The ingestion flow handles upload, parse, chunk, embedding, and Milvus upsert.) Tj
+0 -22 Td
+(The user runtime flow handles Chat Input, query embedding, Milvus search, prompt, and answer.) Tj
+0 -22 Td
+(This separation makes re-indexing, deployment, monitoring, and testing easier.) Tj
+0 -22 Td
+() Tj
+0 -22 Td
+(Expected question:) Tj
+0 -22 Td
+(Why should RAG be split into an ingestion flow and a user runtime flow?) Tj
+0 -22 Td
+(Expected answer:) Tj
+0 -22 Td
+(The ingestion flow updates the knowledge base, while the runtime flow answers user questions.) Tj
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 789 >>
+stream
+BT
+/F1 16 Tf
+72 742 Td
+(Section 2. Component choices for beginners) Tj
+/F1 10 Tf
+0 -22 Td
+() Tj
+0 -22 Td
+(Read File is best for PDF, DOCX, PPTX, and document extraction.) Tj
+0 -22 Td
+(File Dataset Loader is best for CSV, JSON, JSONL, Markdown, and Excel datasets.) Tj
+0 -22 Td
+(The loader normalizes datasets into row_count, columns, preview_rows, rows, and warnings.) Tj
+0 -22 Td
+() Tj
+0 -22 Td
+(Run Flow Payload Adapter serializes structured Data payloads into a JSON Message.) Tj
+0 -22 Td
+(Use it when a subflow accepts text or Message input instead of a full Data object.) Tj
+0 -22 Td
+() Tj
+0 -22 Td
+(Route Gate should mark inactive branches as success=false, active=false, skipped=true.) Tj
+0 -22 Td
+(Downstream nodes should process only active=true and skipped=false branches.) Tj
+ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 832 >>
+stream
+BT
+/F1 16 Tf
+72 742 Td
+(Section 3. Milvus ingest_data record contract) Tj
+/F1 10 Tf
+0 -22 Td
+() Tj
+0 -22 Td
+(Each Milvus record should include id, text, page_content, and metadata.) Tj
+0 -22 Td
+(The metadata should include document_id, source_file, file_type, page, chunk_index,) Tj
+0 -22 Td
+(content_type, modalities, parse_mode, and source_locator.) Tj
+0 -22 Td
+() Tj
+0 -22 Td
+(Recommended collection name for this sample: agent_builder_study_docs.) Tj
+0 -22 Td
+(Recommended primary key field: id.) Tj
+0 -22 Td
+(Recommended text fields: text and page_content.) Tj
+0 -22 Td
+(Recommended metadata fields: document_id, source_file, page, chunk_index, source_locator.) Tj
+0 -22 Td
+() Tj
+0 -22 Td
+(Operational rule:) Tj
+0 -22 Td
+(Do not push full large tables into prompts. Prefer row_count, columns, preview_rows, and data_ref.) Tj
+ET
+endstream
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000133 00000 n 
+0000000203 00000 n 
+0000000329 00000 n 
+0000001216 00000 n 
+0000001342 00000 n 
+0000002182 00000 n 
+0000002308 00000 n 
+trailer
+<< /Size 10 /Root 1 0 R >>
+startxref
+3191
+%%EOF

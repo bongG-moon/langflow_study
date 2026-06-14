@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local environment and secret files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Office temporary lock files
+~$*
+
+# Logs and temporary files
+*.log
+*.tmp
+tmp/
+temp/
