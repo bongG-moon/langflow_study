@@ -6,9 +6,9 @@
 
 1. `sample_rag_handbook.pdf`를 `Read File`에 업로드합니다.
 2. `Read File` 노드의 실행 버튼을 누르고 Inspect Output에서 text/markdown이 나오는지 먼저 확인합니다.
-3. 텍스트 PDF는 `Advanced Parser`를 끈 상태가 가장 빠릅니다. 꼭 필요할 때만 켜고, 먼저 `OCR Engine=None`으로 확인합니다.
-4. `OCR Engine=easyocr`은 이미지/스캔 PDF용이라 오래 걸릴 수 있습니다. `Job queue not found`가 나면 같은 OCR job을 반복하지 말고 `PDF Page Image Extractor`로 필요한 page만 PNG로 분리합니다.
-5. 이미지 PDF는 생성된 PNG를 `Chat Input`의 Files에 첨부하거나, `PDF Page Image Extractor.Vision Message`를 vision-capable model에 연결해 page summary를 만듭니다.
+3. 텍스트 PDF에서 내용이 비어 있으면 PDF 뷰어에서 글자가 드래그/복사되는지 먼저 확인합니다. 복사가 안 되면 이미지/스캔 PDF입니다.
+4. 이미지/스캔 PDF는 `Read File`에서 계속 재시도하지 말고 `PDF Page Image Extractor`로 필요한 page만 PNG로 분리합니다.
+5. 생성된 PNG를 `Chat Input`의 Files에 첨부하거나, `PDF Page Image Extractor.Vision Message`를 vision-capable model에 연결해 page summary를 만듭니다.
 6. 그 다음 `Read File -> Split Text -> Embedding -> Milvus` 또는 `page image summary -> Multimodal Milvus Chunk Builder -> Milvus` 적재 flow를 구성합니다.
 7. 사용자 질문 flow에서 Chat Input에 아래 질문을 넣고 답변을 확인합니다.
 

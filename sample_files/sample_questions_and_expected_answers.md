@@ -23,12 +23,12 @@ RAG를 왜 문서 적재 flow와 사용자 질문 flow로 나눠야 해?
 질문:
 
 ```text
-이미지가 있는 PDF에서 Read File OCR이 너무 오래 걸리거나 Job queue 오류가 나면 어떻게 읽어야 해?
+이미지가 있는 PDF에서 Read File 결과가 비어 있거나 처리가 오래 걸리면 어떻게 읽어야 해?
 ```
 
 기대 답변:
 
-이미지 PDF는 PDF 전체를 `Read File + easyocr`로 오래 돌리기보다 `PDF Page Image Extractor`로 필요한 페이지만 PNG로 분리합니다. 생성된 PNG를 `Chat Input`의 Files에 첨부하거나 `Vision Message`를 vision-capable model에 연결해 page summary를 만든 뒤, 그 summary text와 page metadata를 Milvus/RAG에 저장합니다.
+이미지 PDF는 `Read File`에서 텍스트가 나오지 않는 경우가 많으므로 `PDF Page Image Extractor`로 필요한 페이지만 PNG로 분리합니다. 생성된 PNG를 `Chat Input`의 Files에 첨부하거나 `Vision Message`를 vision-capable model에 연결해 page summary를 만든 뒤, 그 summary text와 page metadata를 Milvus/RAG에 저장합니다.
 
 질문:
 

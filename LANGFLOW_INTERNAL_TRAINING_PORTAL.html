@@ -2850,6 +2850,241 @@ class DocumentLoaderSettings(Component):
             </div>
           </div>
 
+          <div class="panel" style="margin-top:22px">
+            <h3>Python 코드에서 input / output을 넣는 위치</h3>
+            <p class="muted-text">Custom component의 `inputs`와 `outputs`는 class 안에 선언합니다. `inputs`는 Langflow 화면의 입력 field와 왼쪽 input port를 만들고, `outputs`는 오른쪽 output port와 실행 method를 연결합니다.</p>
+            <div class="grid-2">
+              <div class="card">
+                <h3>Input 선언 기준</h3>
+                <p>`name`은 Python method에서 `self.name`으로 읽는 내부 변수명입니다. `display_name`은 화면 label, `info`는 툴팁, `required`는 필수 여부, `advanced`는 고급 영역 표시 여부입니다.</p>
+              </div>
+              <div class="card">
+                <h3>Output 선언 기준</h3>
+                <p>`Output(method="build_result")`는 오른쪽 port를 누르면 `build_result()`를 실행한다는 뜻입니다. method는 `Data`, `Message`, `DataFrame`처럼 연결하려는 port 타입에 맞는 객체를 반환해야 합니다.</p>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="beginner-table">
+                <thead>
+                  <tr>
+                    <th>옵션</th>
+                    <th>어디에 쓰나</th>
+                    <th>의미</th>
+                    <th>초보자 기준</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>`name`</td>
+                    <td>모든 Input, Output</td>
+                    <td>코드에서 접근하는 고정 식별자입니다.</td>
+                    <td>영문 snake_case로 쓰고 자주 바꾸지 않습니다.</td>
+                  </tr>
+                  <tr>
+                    <td>`display_name`</td>
+                    <td>모든 Input, Output</td>
+                    <td>Langflow 화면에 보이는 이름입니다.</td>
+                    <td>사용자가 읽기 쉬운 짧은 이름으로 씁니다.</td>
+                  </tr>
+                  <tr>
+                    <td>`info`</td>
+                    <td>Input</td>
+                    <td>입력 옆 도움말입니다.</td>
+                    <td>어떤 값을 넣어야 하는지 한 문장으로 씁니다.</td>
+                  </tr>
+                  <tr>
+                    <td>`value`</td>
+                    <td>Input</td>
+                    <td>기본값입니다.</td>
+                    <td>실습자가 바로 실행할 수 있는 안전한 값을 둡니다.</td>
+                  </tr>
+                  <tr>
+                    <td>`required`</td>
+                    <td>Input</td>
+                    <td>필수 입력 여부입니다.</td>
+                    <td>없으면 실행할 수 없는 값만 `True`로 둡니다.</td>
+                  </tr>
+                  <tr>
+                    <td>`advanced`</td>
+                    <td>Input</td>
+                    <td>기본 화면에서 숨겨도 되는 운영 옵션입니다.</td>
+                    <td>debug, timeout, limit, threshold는 보통 `advanced=True`가 좋습니다.</td>
+                  </tr>
+                  <tr>
+                    <td>`input_types`</td>
+                    <td>`DataInput`, `DataFrameInput` 등</td>
+                    <td>어떤 output port 타입을 받을지 제한합니다.</td>
+                    <td>`DataInput(..., input_types=["Data", "JSON"])`처럼 명시하면 연결 실수가 줄어듭니다.</td>
+                  </tr>
+                  <tr>
+                    <td>`options`</td>
+                    <td>`DropdownInput`</td>
+                    <td>선택 가능한 값 목록입니다.</td>
+                    <td>mode, provider, route처럼 정해진 값은 text input보다 dropdown을 씁니다.</td>
+                  </tr>
+                  <tr>
+                    <td>`real_time_refresh`</td>
+                    <td>Input</td>
+                    <td>값이 바뀔 때 `update_build_config()`를 다시 호출합니다.</td>
+                    <td>선택값에 따라 다른 field를 보이거나 숨길 때만 씁니다.</td>
+                  </tr>
+                  <tr>
+                    <td>`dynamic`, `show`</td>
+                    <td>Input</td>
+                    <td>조건부 field를 처음에는 숨길 수 있습니다.</td>
+                    <td>예: 인증 방식이 `bearer`일 때만 token field 표시.</td>
+                  </tr>
+                  <tr>
+                    <td>`tool_mode`</td>
+                    <td>일부 Input</td>
+                    <td>Agent가 tool 호출 시 채울 argument로 노출합니다.</td>
+                    <td>사용자 질문, route, limit처럼 Agent가 채워도 되는 값에만 붙입니다.</td>
+                  </tr>
+                  <tr>
+                    <td>`types`</td>
+                    <td>`Output`</td>
+                    <td>화면 port 타입 힌트입니다.</td>
+                    <td>반환 객체와 맞춰 `["Data"]`, `["Message"]`, `["DataFrame"]`처럼 둡니다.</td>
+                  </tr>
+                  <tr>
+                    <td>`method`</td>
+                    <td>`Output`</td>
+                    <td>output port가 실행할 class method 이름입니다.</td>
+                    <td>문자열과 실제 method 이름이 1글자라도 다르면 실행되지 않습니다.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="code-card" data-code-collapsible>
+              <div class="code-head">
+                <strong>input / output 선언 위치를 보여주는 최소 예제</strong>
+                <button class="copy-button"><i data-lucide="copy"></i>복사</button>
+              </div>
+              <pre><code>from __future__ import annotations
+
+import json
+from typing import Any
+
+from lfx.custom import Component
+from lfx.io import BoolInput, DataInput, DropdownInput, IntInput, MessageTextInput, Output
+from lfx.schema import Data
+from lfx.schema.message import Message
+
+
+def _as_payload(value: Any) -> dict:
+    """Data, dict, JSON string, Message를 모두 dict payload로 맞춥니다."""
+    if value is None:
+        return {}
+    if isinstance(value, dict):
+        return value
+    data = getattr(value, "data", None)
+    if isinstance(data, dict):
+        return data
+    text = getattr(value, "text", None) or getattr(value, "content", None)
+    if isinstance(text, str) and text.strip():
+        try:
+            parsed = json.loads(text)
+            return parsed if isinstance(parsed, dict) else {"text": text}
+        except Exception:
+            return {"text": text}
+    if isinstance(value, str) and value.strip():
+        try:
+            parsed = json.loads(value)
+            return parsed if isinstance(parsed, dict) else {"text": value}
+        except Exception:
+            return {"text": value}
+    return {}
+
+
+class InputOutputContractExample(Component):
+    display_name = "Input Output Contract Example"
+    description = "Shows where inputs and outputs are declared in a custom component."
+    icon = "Cable"
+    name = "InputOutputContractExample"
+
+    inputs = [
+        MessageTextInput(
+            name="request_text",
+            display_name="Request Text",
+            info="사용자 질문이나 처리 지시문입니다. method 안에서는 self.request_text로 읽습니다.",
+            value="요약해줘",
+            required=True,
+            tool_mode=True,
+        ),
+        DataInput(
+            name="payload",
+            display_name="Payload",
+            info="앞 노드에서 넘어온 Data/JSON payload입니다.",
+            input_types=["Data", "JSON"],
+            required=False,
+        ),
+        DropdownInput(
+            name="mode",
+            display_name="Mode",
+            info="실행 모드를 고릅니다.",
+            options=["summary", "extract", "validate"],
+            value="summary",
+        ),
+        IntInput(
+            name="preview_limit",
+            display_name="Preview Limit",
+            info="output에 포함할 preview item 수입니다.",
+            value=5,
+            advanced=True,
+        ),
+        BoolInput(
+            name="include_debug",
+            display_name="Include Debug",
+            info="디버그 정보를 output payload에 포함할지 정합니다.",
+            value=False,
+            advanced=True,
+        ),
+    ]
+
+    outputs = [
+        Output(
+            name="result",
+            display_name="Result",
+            method="build_result",
+            types=["Data"],
+        ),
+        Output(
+            name="message",
+            display_name="Message",
+            method="build_message",
+            types=["Message"],
+        ),
+    ]
+
+    def build_result(self) -> Data:
+        payload = _as_payload(self.payload)
+        limit = max(1, min(int(self.preview_limit or 5), 50))
+
+        result = {
+            "success": True,
+            "request_text": str(self.request_text or "").strip(),
+            "mode": self.mode,
+            "payload_keys": list(payload.keys()),
+            "preview": payload.get("rows", [])[:limit] if isinstance(payload.get("rows"), list) else [],
+            "errors": [],
+        }
+        if self.include_debug:
+            result["debug"] = {"input_type": type(self.payload).__name__, "limit": limit}
+
+        self.status = f"mode={self.mode}, keys={len(result['payload_keys'])}"
+        return Data(data=result)
+
+    def build_message(self) -> Message:
+        data = self.build_result().data
+        text = (
+            f"mode={data['mode']}\n"
+            f"request={data['request_text']}\n"
+            f"payload_keys={', '.join(data['payload_keys']) or '(none)'}"
+        )
+        return Message(text=text)</code></pre>
+            </div>
+          </div>
+
           <div class="panel" style="margin-top:14px">
             <h3>실수하기 쉬운 연결</h3>
             <div class="grid-3">
@@ -2995,10 +3230,10 @@ class DocumentLoaderSettings(Component):
                   <tr>
                     <td>`Read File`</td>
                     <td>PDF, TXT, CSV, DOCX, PPTX 같은 파일을 업로드/선택해 텍스트, markdown, table, structured data로 읽을 때 사용합니다. 예전 자료의 `File` component는 현재 화면에서 `Read File`로 찾는 경우가 많습니다.</td>
-                    <td>`Files` 또는 `Select files`, `Advanced Parser`, parser 관련 옵션</td>
-                    <td>`Raw Content`와 `Markdown`은 보통 `Message`, advanced parsing/structured output은 `Table`, `JSON`, `DataFrame` 계열입니다.</td>
+                    <td>`Files` 또는 `Select files`, 저장 위치, 구분자, 오류 무시 여부 같은 기본 파일 읽기 옵션</td>
+                    <td>`Raw Content` 또는 `Markdown` 계열은 보통 `Message`, 표/JSON처럼 구조화된 결과는 환경에 따라 `Data`, `Table`, `DataFrame` 계열입니다.</td>
                     <td>`Chat Output`, `Prompt Template`, `Split Text`, `Parser`, `Structured Output`, `Type Convert`</td>
-                    <td>파일 확인은 먼저 `Read File` 노드 자체를 실행하고 Inspect Output으로 봅니다. `Advanced Parser + standard + easyocr`은 느릴 수 있으니 텍스트 PDF는 OCR 없이 먼저 확인합니다.</td>
+                    <td>파일 확인은 먼저 `Read File` 노드 자체를 실행하고 Inspect Output으로 봅니다. 이 교육에서는 고급 파서 옵션에 의존하지 않고 기본 output이 비면 PDF를 텍스트 PDF로 다시 준비하거나 이미지 PDF 전용 custom flow로 분기합니다.</td>
                   </tr>
                   <tr>
                     <td>`Parser`</td>
@@ -3442,7 +3677,7 @@ class DocumentLoaderSettings(Component):
                 <div class="recipe-io">
                   <div><b>Input</b> `pdf_file`은 PDF 업로드, `page_range`는 `1-3` 같은 페이지 범위, `instruction`은 vision 모델에 보낼 질문입니다.</div>
                   <div><b>Output</b> `Vision Message`는 `Message(files=[page png])`라 vision-capable Language Model에 연결하고, `Page Manifest`는 렌더링된 이미지 경로와 page metadata를 담은 `Data`입니다.</div>
-                  <div><b>왜 custom?</b> `Read File + easyocr`이 오래 걸리거나 `Job queue not found`가 나면 PDF 전체 OCR 대신 필요한 페이지만 이미지로 분리해 작은 단위로 처리합니다.</div>
+                  <div><b>왜 custom?</b> 이미지 기반 PDF에서 `Read File` 결과가 비어 있거나 처리가 오래 걸리면 PDF 전체를 억지로 읽기보다 필요한 페이지만 이미지로 분리해 작은 단위로 처리합니다.</div>
                 </div>
               </div>
               <a href="examples/pdf_page_image_extractor.py"><i data-lucide="file-code-2"></i>코드 열기</a>
@@ -3733,7 +3968,7 @@ class DocumentLoaderSettings(Component):
                 </div>
                 <div class="connection-lines">
                   <div class="connection-line"><strong>1</strong><span><b>Read File 실행 → Inspect Output</b>: 파일이 실제로 읽혔는지 먼저 여기서 확인합니다. Playground가 비어도 이 결과가 기준입니다.</span></div>
-                  <div class="connection-line"><strong>2</strong><span><b>Read File.Markdown(Message) → Chat Output.input</b>: 화면에 직접 보여주고 싶을 때 쓰는 확인용 연결입니다. `Raw Content`가 비면 Advanced Parser를 켜고 `Markdown` output을 선택합니다.</span></div>
+                  <div class="connection-line"><strong>2</strong><span><b>Read File.Raw Content 또는 Markdown(Message) → Chat Output.input</b>: 화면에 직접 보여주고 싶을 때 쓰는 확인용 연결입니다. output selector에서 실제 내용이 들어 있는 `Message` 계열 output을 선택합니다.</span></div>
                   <div class="connection-line"><strong>3</strong><span><b>Structured Output/Table/JSON → Parser.Data or DataFrame</b>: 구조화 output을 사람이 읽는 문장으로 바꿀 때만 Parser를 사이에 둡니다.</span></div>
                 </div>
               </div>
@@ -3747,7 +3982,7 @@ class DocumentLoaderSettings(Component):
                 <div class="practice-grid">
                   <div class="practice-item"><b>넣을 자료</b><span><a href="sample_files/sample_rag_handbook.pdf">sample_rag_handbook.pdf</a>를 `Read File`에 업로드합니다.</span></div>
                   <div class="practice-item"><b>1차 확인</b><span>`Read File` 노드의 실행 버튼을 누르고 Inspect Output에서 text/markdown이 있는지 봅니다.</span></div>
-                  <div class="practice-item"><b>비어 있을 때</b><span>`Advanced Parser`를 켜고 output을 `Markdown`으로 선택한 뒤 다시 실행합니다.</span></div>
+                  <div class="practice-item"><b>비어 있을 때</b><span>먼저 같은 PDF를 텍스트 선택 가능한 PDF인지 확인합니다. 스캔/이미지 PDF라면 `Read File`에서 억지로 처리하지 말고 Mini Flow 2의 `PDF Page Image Extractor` 방식으로 전환합니다.</span></div>
                   <div class="practice-item"><b>답변 확인</b><span>요약 flow를 붙인 뒤 “첫 페이지를 3줄로 요약해줘”를 Chat Input에 입력합니다.</span></div>
                 </div>
               </div>
@@ -3758,14 +3993,14 @@ class DocumentLoaderSettings(Component):
                 <ol class="beginner-steps">
                   <li><strong>01</strong><span><b>Read File만 먼저 배치</b>캔버스에서 `Read File`을 추가하고 PDF를 선택합니다. 아직 Chat Output에 연결하지 않아도 됩니다.</span></li>
                   <li><strong>02</strong><span><b>노드 실행 결과 확인</b>`Read File` 카드 오른쪽의 실행 버튼을 누른 뒤 Inspect Output에서 내용이 나오는지 확인합니다.</span></li>
-                  <li><strong>03</strong><span><b>비어 있으면 Advanced Parser 사용</b>텍스트 PDF라면 먼저 `Advanced Parser`를 끈 상태로 확인하고, 그래도 필요할 때만 켭니다. 켰다면 `Pipeline=standard`, `OCR Engine=None`으로 먼저 돌립니다.</span></li>
-                  <li><strong>04</strong><span><b>진짜 이미지/스캔 PDF일 때만 OCR</b>`OCR Engine=easyocr`은 페이지를 이미지처럼 읽기 때문에 오래 걸릴 수 있습니다. 스캔본처럼 텍스트가 전혀 추출되지 않을 때만 사용합니다.</span></li>
+                  <li><strong>03</strong><span><b>비어 있으면 파일 성격 확인</b>PDF 뷰어에서 텍스트를 드래그해 복사할 수 있으면 텍스트 PDF입니다. 복사가 안 되면 이미지/스캔 PDF라서 이 흐름이 아니라 Mini Flow 2로 처리합니다.</span></li>
+                  <li><strong>04</strong><span><b>텍스트 PDF도 비면 샘플부터 재확인</b>교육용으로는 먼저 `sample_rag_handbook.pdf`처럼 텍스트가 들어 있는 작은 PDF로 연결을 익힙니다. 회사 문서가 계속 비면 PDF 생성 방식이나 보안/암호화 여부를 확인합니다.</span></li>
                   <li><strong>05</strong><span><b>화면에 보여줄 때만 Chat Output 연결</b>`Markdown(Message)` 또는 내용이 있는 `Raw Content(Message)`를 `Chat Output.input`에 연결합니다.</span></li>
                   <li><strong>06</strong><span><b>요약까지 하려면 Prompt/LLM 추가</b>`Chat Input.Message`와 PDF 내용을 Prompt Template에 합친 뒤 `Language Model → Chat Output`으로 연결합니다.</span></li>
                 </ol>
                 <div class="callout">
-                  <strong>속도 기준</strong>
-                  가장 빠른 순서는 `Advanced Parser OFF` → `Advanced Parser ON + OCR Engine=None` → `OCR Engine=easyocr`입니다. `standard + easyocr`은 OCR 모델을 쓰는 경로라 첫 실행이나 이미지 PDF에서 오래 걸릴 수 있습니다.
+                  <strong>실습 기준</strong>
+                  이 교육자료는 고급 파서 옵션을 필수 단계로 쓰지 않습니다. 텍스트 PDF는 `Read File` 기본 output으로 확인하고, 이미지/스캔 PDF는 `PDF Page Image Extractor → vision-capable Language Model` 흐름으로 분리합니다.
                 </div>
                 <div class="code-card" data-code-collapsible>
                   <div class="code-head">
@@ -3852,8 +4087,8 @@ class DocumentLoaderSettings(Component):
               </div>
             </div>
             <div class="card">
-              <h3>Mini Flow 2. PDF OCR / Image Summary</h3>
-              <p>이미지 기반 PDF는 `Read File + OCR`을 오래 돌리기보다, 필요한 페이지만 PNG로 분리한 뒤 vision-capable model에 넣는 편이 안정적입니다. `Job queue not found`가 나면 OCR job을 재시도하기보다 페이지 이미지 방식으로 전환합니다.</p>
+              <h3>Mini Flow 2. Image PDF / Vision Summary</h3>
+              <p>이미지 기반 PDF는 `Read File`에서 텍스트가 나오지 않는 경우가 많습니다. 이때는 필요한 페이지만 PNG로 분리한 뒤 vision-capable model에 넣어 페이지 요약을 만드는 방식이 더 단순하고 안정적입니다.</p>
               <div class="branch-flow" aria-label="PDF OCR and image summary branch flow">
                 <div class="branch-node branch-chat">
                   <span class="node-badge io">입출력</span>
@@ -3896,7 +4131,7 @@ class DocumentLoaderSettings(Component):
               <div class="implementation-list">
                 <div class="implementation-row"><b>기본 노드</b><span>Chat Input, Prompt Template, vision-capable Language Model, Chat Output을 사용합니다. Chat Input의 고급 `Files`에는 PNG 이미지를 첨부할 수 있습니다.</span></div>
                 <div class="implementation-row"><b>Custom 코드</b><span>PDF 페이지 이미지는 <a href="examples/pdf_page_image_extractor.py">PDF Page Image Extractor</a>, 설정값은 <a href="examples/document_loader_settings.py">Document Loader Settings</a>, Milvus 적재용 chunk는 <a href="examples/multimodal_milvus_chunk_builder.py">Multimodal Milvus Chunk Builder</a>를 봅니다.</span></div>
-                <div class="implementation-row"><b>연결 기준</b><span>OCR은 글자 추출, vision은 표/차트/도면의 의미 해석입니다. 이미지 PDF는 먼저 페이지 이미지로 쪼개고, 페이지별 요약 text를 만들어 RAG에 저장합니다.</span></div>
+                <div class="implementation-row"><b>연결 기준</b><span>이미지 PDF는 먼저 페이지 이미지로 쪼개고, vision 모델이 만든 페이지별 요약 text를 Prompt/RAG에 사용합니다. 글자 추출과 표/차트 의미 해석을 한 flow에 억지로 합치지 않습니다.</span></div>
               </div>
               <div class="practice-box">
                 <h4>실습 예시: 이미지 기반 PDF를 요약해 보기</h4>
@@ -3915,9 +4150,9 @@ class DocumentLoaderSettings(Component):
                   <li><strong>02</strong><span><b>이미지 품질 확인</b>생성된 PNG를 열어 표/차트/텍스트가 보이는지 확인합니다. 너무 작으면 `render_scale`을 2.0 정도로 올립니다.</span></li>
                   <li><strong>03</strong><span><b>vision 모델로 페이지 설명 생성</b>`Vision Message`를 vision-capable `Language Model`에 연결합니다. 모델이 이미지 입력을 받지 못하면 생성된 PNG를 `Chat Input`의 Files에 직접 첨부해 테스트합니다.</span></li>
                   <li><strong>04</strong><span><b>요약 text를 RAG에 저장</b>vision 답변을 page metadata와 함께 `Multimodal Milvus Chunk Builder.document_payload`에 넣고 Milvus에 저장합니다.</span></li>
-                  <li><strong>05</strong><span><b>OCR은 마지막 선택지</b>글자 자체가 필요할 때만 OCR을 쓰고, `standard + easyocr`이 오래 걸리면 page 범위를 줄여 다시 시도합니다.</span></li>
+                  <li><strong>05</strong><span><b>페이지 단위로 검증</b>모든 페이지를 한 번에 처리하기보다 1~2페이지로 먼저 연결을 확인하고, 결과가 맞으면 page 범위를 늘립니다.</span></li>
                 </ol>
-                <p>`Job queue not found`는 긴 OCR 작업이 Langflow Desktop의 job queue와 맞물려 끊긴 신호일 수 있습니다. 이때는 같은 설정으로 계속 재시도하지 말고, 페이지 이미지 추출 방식으로 범위를 작게 나누는 것이 안전합니다.</p>
+                <p>`Read File`에서 이미지 PDF 내용이 비어 있으면 같은 설정을 반복하지 말고, 페이지 이미지 추출 방식으로 범위를 작게 나누어 확인합니다.</p>
                 <div class="code-card" data-code-collapsible>
                   <div class="code-head">
                     <strong>Prompt Template에 붙여넣을 양식</strong>
@@ -5208,7 +5443,7 @@ langflow run --port 7860
             <li><a href="https://docs.langflow.org/agents-tools">Configure tools for agents</a> - Tool Mode, custom component tool, Run Flow tool</li>
             <li><a href="https://docs.langflow.org/run-flow">Run Flow</a> - 하위 flow 실행, 동적 input/output field, Agent tool 연결 기준</li>
             <li><a href="https://docs.langflow.org/concepts-flows">Build flows</a> - flow의 기본 개념과 template 기반 시작점</li>
-            <li><a href="https://docs.langflow.org/read-file">Read File</a> - 파일 업로드, advanced parsing, PDF/OCR 처리 옵션</li>
+            <li><a href="https://docs.langflow.org/read-file">Read File</a> - 파일 업로드와 기본 파일 읽기 노드 사용법</li>
             <li><a href="https://docs.langflow.org/chat-with-rag">Create a vector RAG chatbot</a> - Load Data Flow / Retriever Flow 분리와 RAG 화면 이미지 출처</li>
             <li><a href="https://docs.langflow.org/bundles-docling">Docling bundle</a> - 문서 파싱, chunking, vector store 적재 화면 이미지 출처</li>
             <li><a href="https://docs.langflow.org/bundles-milvus">Milvus bundle</a> - Milvus vector store, `ingest_data`, `embedding`, `collection_name`, `uri`, search 설정</li>

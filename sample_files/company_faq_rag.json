@@ -9,7 +9,11 @@
       "expected_answer": "RAG는 문서 적재 flow와 사용자 질문 runtime flow로 분리하는 것이 좋다. 적재 flow는 업로드/파싱/chunk/embedding/Milvus upsert를 담당하고, runtime flow는 질문/search/prompt/답변을 담당한다.",
       "source": "agent-builder-study",
       "section": "RAG",
-      "tags": ["rag", "lifecycle", "milvus"]
+      "tags": [
+        "rag",
+        "lifecycle",
+        "milvus"
+      ]
     },
     {
       "doc_id": "kb-002",
@@ -20,7 +24,11 @@
       "expected_answer": "Read File은 문서 추출용이고, File Dataset Loader는 CSV/JSON/Excel/Markdown 같은 데이터셋을 표준 Data payload로 정리할 때 쓴다.",
       "source": "agent-builder-study",
       "section": "File",
-      "tags": ["file", "dataset", "adapter"]
+      "tags": [
+        "file",
+        "dataset",
+        "adapter"
+      ]
     },
     {
       "doc_id": "kb-003",
@@ -31,7 +39,11 @@
       "expected_answer": "기본 output에는 success, errors, warnings를 넣고, 데이터 결과는 row_count, columns, preview_rows, data_ref 중심으로 전달한다.",
       "source": "agent-builder-study",
       "section": "Component Contract",
-      "tags": ["output", "data", "errors"]
+      "tags": [
+        "output",
+        "data",
+        "errors"
+      ]
     },
     {
       "doc_id": "kb-004",
@@ -42,7 +54,11 @@
       "expected_answer": "선택되지 않은 branch는 success=false, active=false, skipped=true로 표시하고 downstream에서는 active=true인 branch만 처리한다.",
       "source": "agent-builder-study",
       "section": "Routing",
-      "tags": ["route", "branch", "skipped"]
+      "tags": [
+        "route",
+        "branch",
+        "skipped"
+      ]
     },
     {
       "doc_id": "kb-005",
@@ -53,7 +69,11 @@
       "expected_answer": "Data payload를 JSON 문자열 Message로 감싸 Run Flow에 넘기고, 결과는 Parser나 Type Convert로 다시 Data화한다.",
       "source": "agent-builder-study",
       "section": "Run Flow",
-      "tags": ["run_flow", "message", "payload"]
+      "tags": [
+        "run_flow",
+        "message",
+        "payload"
+      ]
     },
     {
       "doc_id": "kb-006",
@@ -64,40 +84,58 @@
       "expected_answer": "Milvus record에는 id, text/page_content, metadata가 들어가며 metadata에는 document_id, source_file, page, chunk_index, modalities 같은 값이 포함된다.",
       "source": "agent-builder-study",
       "section": "Milvus",
-      "tags": ["milvus", "ingest_data", "metadata"]
+      "tags": [
+        "milvus",
+        "ingest_data",
+        "metadata"
+      ]
     },
     {
       "doc_id": "kb-007",
-      "title": "Read File Advanced Parser 연결 기준",
+      "title": "Read File output ?? ??",
       "category": "basic_node",
-      "question_hint": "Read File Advanced Parser를 켜면 Parser에 바로 연결하면 돼?",
-      "content": "Read File의 Advanced Parser 토글은 구조화 output과 Markdown output을 만들 수 있게 하는 옵션이다. 파일이 읽혔는지는 Chat Output보다 Read File 노드를 직접 실행한 뒤 Inspect Output에서 먼저 확인한다. Parser의 Data or DataFrame input에 연결하려면 Read File 노드 하단의 output selector에서 Structured Output, Table, JSON 같은 구조화 output을 선택해야 한다. 화면에 텍스트를 보여주려면 내용이 있는 Raw Content 또는 Markdown Message를 Chat Output이나 Prompt Template에 연결한다.",
-      "expected_answer": "Advanced Parser만 켠다고 Parser에 바로 연결되는 것은 아니다. 먼저 Read File 실행 결과를 Inspect Output에서 확인하고, Parser에는 Structured Output/Table/JSON을, 화면 표시나 Prompt에는 내용이 있는 Raw Content/Markdown Message를 연결한다.",
+      "question_hint": "Read File ??? Parser? Chat Output ? ??? ???? ??",
+      "content": "??? ????? Chat Output?? Read File ??? ?? ??? ? Inspect Output?? ?? ????. ??? ???? ????? ??? ?? Raw Content ?? Markdown Message? Chat Output?? Prompt Template? ????. Parser? Data or DataFrame input? ????? Message? ??? Structured Output, Table, JSON, DataFrame?? ???? output? ???? ??. ??? output? ?? ????? ?? Chat Output?? ???? ??? ? Prompt Template?? custom normalizer?? ??? ??? ????.",
+      "expected_answer": "?? Read File ?? ??? Inspect Output?? ????. ?? ??? Prompt?? Raw Content/Markdown Message? ????, Parser?? Structured Output/Table/JSON/DataFrame?? ???? output? ????. ??? output? ??? ???? ??? ? custom normalizer? Prompt Template?? ????.",
       "source": "agent-builder-study",
       "section": "Read File",
-      "tags": ["read_file", "parser", "message"]
+      "tags": [
+        "read_file",
+        "parser",
+        "message"
+      ]
     },
     {
       "doc_id": "kb-008",
-      "title": "Read File Advanced Parser 속도 기준",
+      "title": "Read File ??? ?? ?? ? ?? ??",
       "category": "basic_node",
-      "question_hint": "Advanced Parser standard pipeline이 너무 오래 걸리면 어떻게 해?",
-      "content": "Langflow Desktop의 Read File에서 Advanced Parser를 켜고 Pipeline을 standard로 두면 Docling 기반 고급 문서 처리 경로를 사용한다. standard pipeline에서 OCR Engine이 easyocr이면 페이지를 이미지처럼 분석하므로 텍스트 PDF보다 훨씬 오래 걸릴 수 있다. 초보 실습은 먼저 Advanced Parser를 끄고 Raw Content를 확인한다. 내용이 비어 있으면 Advanced Parser를 켜되 OCR Engine=None으로 Markdown output을 먼저 확인한다. 그래도 스캔본이나 이미지 PDF라 텍스트가 없을 때만 OCR Engine=easyocr을 사용한다.",
-      "expected_answer": "느리면 먼저 Advanced Parser를 끄고 확인하고, 필요할 때만 켠다. 켠 경우에도 OCR Engine=None으로 먼저 Markdown을 확인한 뒤, 스캔/이미지 PDF일 때만 easyocr을 사용한다.",
+      "question_hint": "Read File? ????? ??? ?? ??? ??? ??",
+      "content": "?? ??? ?? ???? ?? ?? ?? PDF? Read File ?? output? ????. ??? ?? ??? PDF ???? ??? ???/????? ????. ??? ???? ?? ??, ???, ??? ??, output selector? ????. ??? ? ?? ???/?? PDF??? Read File?? ?? ????? ?? PDF Page Image Extractor? ??? ???? PNG? ??? ? vision-capable model? ???.",
+      "expected_answer": "Read File ??? ?? ?? ??? ?? ??? PDF?? ????. ??? PDF?? output selector? ?? ??/???? ????, ???/?? PDF?? PDF Page Image Extractor? ??? PNG? ??? vision ??? ???.",
       "source": "agent-builder-study",
       "section": "Read File",
-      "tags": ["read_file", "advanced_parser", "ocr", "performance"]
+      "tags": [
+        "read_file",
+        "empty_output",
+        "text_pdf",
+        "image_pdf"
+      ]
     },
     {
       "doc_id": "kb-009",
       "title": "이미지 PDF 처리 우회 기준",
       "category": "basic_node",
       "question_hint": "이미지 PDF에서 Job queue not found가 나면 어떻게 읽어?",
-      "content": "이미지 기반 PDF를 Read File의 Advanced Parser와 OCR Engine=easyocr로 통째로 처리하면 오래 걸리고 Langflow Desktop job queue가 끊길 수 있다. 이때는 같은 OCR job을 반복하지 말고 PDF Page Image Extractor로 필요한 페이지만 PNG로 렌더링한다. 생성된 PNG는 Chat Input의 Files에 직접 첨부하거나 Vision Message output으로 vision-capable Language Model에 보낸다. 모델이 만든 page summary text와 page metadata를 Multimodal Milvus Chunk Builder에 넣어 RAG용 chunk로 저장한다.",
-      "expected_answer": "Job queue 오류가 나면 OCR을 반복하지 말고 PDF Page Image Extractor로 page PNG를 만든다. PNG를 Chat Input Files나 Vision Message로 vision 모델에 보내 page summary를 만들고, 그 summary를 Milvus/RAG에 저장한다.",
+      "content": "??? ?? PDF? Read File ?? output? ?? ?? ? ??. ??? ?? ?? ??? ???? ?? PDF Page Image Extractor? ??? ???? PNG? ?????. ??? PNG? Chat Input? Files? ?? ????? Vision Message output?? vision-capable Language Model? ???. ??? ?? page summary text? page metadata? Multimodal Milvus Chunk Builder? ?? RAG? chunk? ????.",
+      "expected_answer": "??? PDF? PDF Page Image Extractor? page PNG? ???. PNG? Chat Input Files? Vision Message? vision ??? ?? page summary? ???, ? summary? Milvus/RAG? ????.",
       "source": "agent-builder-study",
       "section": "Image PDF",
-      "tags": ["image_pdf", "vision", "job_queue", "pdf_page_image_extractor"]
+      "tags": [
+        "image_pdf",
+        "vision",
+        "job_queue",
+        "pdf_page_image_extractor"
+      ]
     }
   ]
 }

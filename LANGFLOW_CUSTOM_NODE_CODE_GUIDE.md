@@ -143,6 +143,152 @@ class ExampleDataNode(Component):
 - output method에는 `-> Data`, `-> Message`, `-> DataFrame` 같은 return annotation을 명확히 적는다.
 - custom node 사이의 구조화된 데이터는 plain `dict`보다 `Data(data=...)`로 넘긴다.
 
+### 2.1 Python 코드에서 input/output을 선언하는 위치
+
+Custom component에서 input과 output은 class body 안에 선언한다. `inputs`는 Langflow 화면의 입력 field와 왼쪽 input port를 만들고, `outputs`는 오른쪽 output port와 실행 method를 연결한다.
+
+```python
+from __future__ import annotations
+
+import json
+from typing import Any
+
+from lfx.custom import Component
+from lfx.io import BoolInput, DataInput, DropdownInput, IntInput, MessageTextInput, Output
+from lfx.schema import Data
+from lfx.schema.message import Message
+
+
+def _as_payload(value: Any) -> dict:
+    if value is None:
+        return {}
+    if isinstance(value, dict):
+        return value
+    data = getattr(value, "data", None)
+    if isinstance(data, dict):
+        return data
+    text = getattr(value, "text", None) or getattr(value, "content", None)
+    if isinstance(text, str) and text.strip():
+        try:
+            parsed = json.loads(text)
+            return parsed if isinstance(parsed, dict) else {"text": text}
+        except Exception:
+            return {"text": text}
+    if isinstance(value, str) and value.strip():
+        try:
+            parsed = json.loads(value)
+            return parsed if isinstance(parsed, dict) else {"text": value}
+        except Exception:
+            return {"text": value}
+    return {}
+
+
+class InputOutputContractExample(Component):
+    display_name = "Input Output Contract Example"
+    description = "Shows where inputs and outputs are declared in a custom component."
+    icon = "Cable"
+    name = "InputOutputContractExample"
+
+    inputs = [
+        MessageTextInput(
+            name="request_text",
+            display_name="Request Text",
+            info="사용자 질문이나 처리 지시문입니다. method 안에서는 self.request_text로 읽습니다.",
+            value="요약해줘",
+            required=True,
+            tool_mode=True,
+        ),
+        DataInput(
+            name="payload",
+            display_name="Payload",
+            info="앞 노드에서 넘어온 Data/JSON payload입니다.",
+            input_types=["Data", "JSON"],
+            required=False,
+        ),
+        DropdownInput(
+            name="mode",
+            display_name="Mode",
+            info="실행 모드를 고릅니다.",
+            options=["summary", "extract", "validate"],
+            value="summary",
+        ),
+        IntInput(
+            name="preview_limit",
+            display_name="Preview Limit",
+            info="output에 포함할 preview item 수입니다.",
+            value=5,
+            advanced=True,
+        ),
+        BoolInput(
+            name="include_debug",
+            display_name="Include Debug",
+            info="디버그 정보를 output payload에 포함할지 정합니다.",
+            value=False,
+            advanced=True,
+        ),
+    ]
+
+    outputs = [
+        Output(
+            name="result",
+            display_name="Result",
+            method="build_result",
+            types=["Data"],
+        ),
+        Output(
+            name="message",
+            display_name="Message",
+            method="build_message",
+            types=["Message"],
+        ),
+    ]
+
+    def build_result(self) -> Data:
+        payload = _as_payload(self.payload)
+        limit = max(1, min(int(self.preview_limit or 5), 50))
+
+        result = {
+            "success": True,
+            "request_text": str(self.request_text or "").strip(),
+            "mode": self.mode,
+            "payload_keys": list(payload.keys()),
+            "preview": payload.get("rows", [])[:limit] if isinstance(payload.get("rows"), list) else [],
+            "errors": [],
+        }
+        if self.include_debug:
+            result["debug"] = {"input_type": type(self.payload).__name__, "limit": limit}
+
+        self.status = f"mode={self.mode}, keys={len(result['payload_keys'])}"
+        return Data(data=result)
+
+    def build_message(self) -> Message:
+        data = self.build_result().data
+        text = (
+            f"mode={data['mode']}\n"
+            f"request={data['request_text']}\n"
+            f"payload_keys={', '.join(data['payload_keys']) or '(none)'}"
+        )
+        return Message(text=text)
+```
+
+자주 쓰는 옵션은 다음처럼 이해하면 된다.
+
+| 옵션 | 사용하는 곳 | 의미 | 권장 기준 |
+| --- | --- | --- | --- |
+| `name` | Input, Output | 코드에서 쓰는 내부 식별자 | `self.<name>`으로 접근하므로 snake_case로 고정 |
+| `display_name` | Input, Output | 화면에 보이는 label | 사용자에게 보일 짧은 이름 |
+| `info` | Input | 입력 도움말 | 어떤 값을 넣는지 한 문장으로 설명 |
+| `value` | Input | 기본값 | 처음 실행해도 실패하지 않는 안전한 값 |
+| `required` | Input | 필수 여부 | 없으면 실행할 수 없는 값만 `True` |
+| `advanced` | Input | 고급 영역 표시 | debug, timeout, limit, threshold에 사용 |
+| `input_types` | `DataInput`, `DataFrameInput` 등 | 받을 수 있는 port 타입 제한 | `["Data", "JSON"]`처럼 명시 |
+| `options` | `DropdownInput` | 선택지 목록 | mode, provider, route처럼 고정된 값에 사용 |
+| `real_time_refresh` | Input | 값 변경 시 `update_build_config()` 호출 | 다른 field show/required/options를 바꿀 때만 사용 |
+| `dynamic`, `show` | Input | 조건부 field 표시 | 인증 방식에 따라 token field 표시 같은 경우 |
+| `tool_mode` | 일부 Input | Agent tool argument로 노출 | Agent가 채워도 되는 값에만 사용 |
+| `types` | `Output` | output port 타입 힌트 | 반환 객체와 맞게 `["Data"]`, `["Message"]`, `["DataFrame"]` |
+| `method` | `Output` | 실행할 method 이름 | 실제 method 이름과 정확히 일치해야 함 |
+
 ## 3. Import path
 
 Langflow Desktop 1.10.x 기준으로 custom component 코드 맨 위에는 아래 import를 둔다.

@@ -7,7 +7,12 @@
       "flow": "Read File -> Split Text -> Embedding -> Milvus -> Chat Output",
       "question": "RAG를 왜 문서 적재 flow와 사용자 질문 flow로 나눠야 해?",
       "expected_answer": "문서 적재 flow는 upload/parse/chunk/embedding/Milvus upsert를 담당하고, 사용자 질문 flow는 Chat Input/query embedding/Milvus search/prompt/answer를 담당한다. 분리하면 재색인과 사용자 응답을 따로 배포, 테스트, 모니터링할 수 있다.",
-      "must_include": ["문서 적재", "사용자 질문", "Milvus", "분리"]
+      "must_include": [
+        "문서 적재",
+        "사용자 질문",
+        "Milvus",
+        "분리"
+      ]
     },
     {
       "id": "json-rag-001",
@@ -15,7 +20,11 @@
       "flow": "File Dataset Loader -> Prompt/LLM or Data search",
       "question": "File Dataset Loader는 Read File 대신 언제 써?",
       "expected_answer": "Read File은 PDF/DOCX/PPTX 문서 추출용이고, File Dataset Loader는 CSV/JSON/JSONL/Markdown/Excel 데이터셋을 row_count, columns, preview_rows, rows, warnings가 있는 표준 Data payload로 정규화할 때 쓴다.",
-      "must_include": ["Read File", "데이터셋", "표준 Data payload"]
+      "must_include": [
+        "Read File",
+        "데이터셋",
+        "표준 Data payload"
+      ]
     },
     {
       "id": "json-rag-002",
@@ -23,7 +32,11 @@
       "flow": "File Dataset Loader -> Prompt/LLM or Data search",
       "question": "Route Gate에서 선택되지 않은 branch는 어떻게 처리해야 해?",
       "expected_answer": "선택되지 않은 branch는 success=false, active=false, skipped=true로 반환하고, downstream은 active=true이며 skipped=false인 branch만 처리해야 한다.",
-      "must_include": ["success=false", "active=false", "skipped=true"]
+      "must_include": [
+        "success=false",
+        "active=false",
+        "skipped=true"
+      ]
     },
     {
       "id": "csv-analysis-001",
@@ -31,7 +44,12 @@
       "flow": "File Dataset Loader or CSV -> Safe DataFrame Profiler -> LLM",
       "question": "defect_rate가 가장 높은 lot과 원인, 조치가 뭐야?",
       "expected_answer": "LOT-C-2409가 defect_rate 0.0323으로 가장 높다. 원인은 금형 냉각 편차이고, 권장 조치는 냉각수 유량 점검 후 금형 조건 재승인이다.",
-      "must_include": ["LOT-C-2409", "0.0323", "금형 냉각 편차", "냉각수 유량"]
+      "must_include": [
+        "LOT-C-2409",
+        "0.0323",
+        "금형 냉각 편차",
+        "냉각수 유량"
+      ]
     },
     {
       "id": "csv-analysis-002",
@@ -39,7 +57,12 @@
       "flow": "File Dataset Loader or CSV -> Safe DataFrame Profiler -> LLM",
       "question": "라인별 평균 defect_rate를 비교하면 어디가 가장 위험해?",
       "expected_answer": "C라인이 평균 defect_rate 약 0.0272로 가장 높다. A라인은 약 0.0170, B라인은 약 0.0081, D라인은 0.0056 수준이다.",
-      "must_include": ["C라인", "0.027", "A라인", "B라인"]
+      "must_include": [
+        "C라인",
+        "0.027",
+        "A라인",
+        "B라인"
+      ]
     },
     {
       "id": "jsonl-ticket-001",
@@ -47,7 +70,12 @@
       "flow": "File Dataset Loader(parse_mode=jsonl) -> Prompt/LLM",
       "question": "현재 open 상태의 high priority 티켓은 무엇이고 해결 방향은 뭐야?",
       "expected_answer": "open 상태의 high priority 티켓은 TCK-2001이다. Milvus 적재 flow의 ingest_data는 생성되지만 runtime flow 검색 결과가 비어 있는 문제이며, collection_name과 embedding model 차원을 적재/runtime flow에서 동일하게 맞춰야 한다.",
-      "must_include": ["TCK-2001", "Milvus", "collection_name", "embedding"]
+      "must_include": [
+        "TCK-2001",
+        "Milvus",
+        "collection_name",
+        "embedding"
+      ]
     },
     {
       "id": "milvus-payload-001",
@@ -55,7 +83,13 @@
       "flow": "Multimodal Milvus Chunk Builder",
       "question": "Milvus record metadata에는 어떤 값들이 들어가야 해?",
       "expected_answer": "metadata에는 document_id, source_file, page, chunk_index, content_type, modalities, parse_mode, source_locator 같은 값이 들어가야 한다.",
-      "must_include": ["document_id", "source_file", "page", "chunk_index", "source_locator"]
+      "must_include": [
+        "document_id",
+        "source_file",
+        "page",
+        "chunk_index",
+        "source_locator"
+      ]
     },
     {
       "id": "visual-pdf-001",
@@ -63,15 +97,27 @@
       "flow": "PDF Page Image Extractor -> Vision-capable Language Model -> Chat Output",
       "question": "2페이지 공정 흐름도에서 병목 후보와 조치 우선순위를 요약해줘.",
       "expected_answer": "2페이지 공정 흐름도에서는 검사 대기가 평균 42분으로 가장 길어 병목 후보다. 재작업은 냉각 단계로 되돌아가는 루프를 만들며 처리 시간을 늘린다. 우선 조치는 LOT-C-2409 중심으로 냉각수 유량 점검과 금형 조건 재승인이다.",
-      "must_include": ["검사 대기", "42분", "재작업", "LOT-C-2409", "냉각수 유량"]
+      "must_include": [
+        "검사 대기",
+        "42분",
+        "재작업",
+        "LOT-C-2409",
+        "냉각수 유량"
+      ]
     },
     {
       "id": "visual-pdf-queue-001",
       "file": "sample_visual_process_report.pdf",
       "flow": "PDF Page Image Extractor -> Chat Input.Files or Vision Message -> Vision-capable Language Model",
-      "question": "이미지가 있는 PDF에서 Read File OCR이 너무 오래 걸리거나 Job queue 오류가 나면 어떻게 읽어야 해?",
-      "expected_answer": "OCR job을 반복하지 말고 PDF Page Image Extractor로 필요한 페이지만 PNG로 분리한다. 생성된 PNG를 Chat Input Files에 첨부하거나 Vision Message로 vision-capable model에 보내 page summary를 만들고, 그 summary text와 page metadata를 Milvus/RAG에 저장한다.",
-      "must_include": ["PDF Page Image Extractor", "PNG", "Chat Input", "vision", "Milvus"]
+      "question": "???? ?? PDF?? Read File ??? ?? ??? ??? ?? ??? ??? ??? ??",
+      "expected_answer": "Read File ??? ???? ?? PDF Page Image Extractor? ??? ???? PNG? ????. ??? PNG? Chat Input Files? ????? Vision Message? vision-capable model? ?? page summary? ???, ? summary text? page metadata? Milvus/RAG? ????.",
+      "must_include": [
+        "PDF Page Image Extractor",
+        "PNG",
+        "Chat Input",
+        "vision",
+        "Milvus"
+      ]
     },
     {
       "id": "visual-pdf-002",
@@ -79,7 +125,13 @@
       "flow": "PDF Page Image Extractor -> Vision summary -> Multimodal Milvus Chunk Builder -> Milvus -> Runtime RAG",
       "question": "3페이지 defect_rate 차트에서 가장 위험한 lot과 원인은 뭐야?",
       "expected_answer": "3페이지 차트에서 LOT-C-2409가 defect_rate 0.0323으로 가장 위험하다. 문서의 원인 설명은 금형 냉각 편차이며, LOT-C-2408과 LOT-C-2406도 0.028 이상이라 C라인 냉각/지그/금형 조건을 함께 점검해야 한다.",
-      "must_include": ["LOT-C-2409", "0.0323", "금형 냉각 편차", "LOT-C-2408", "LOT-C-2406"]
+      "must_include": [
+        "LOT-C-2409",
+        "0.0323",
+        "금형 냉각 편차",
+        "LOT-C-2408",
+        "LOT-C-2406"
+      ]
     },
     {
       "id": "run-flow-001",
@@ -87,7 +139,12 @@
       "flow": "Run Flow Payload Adapter -> Run Flow",
       "question": "이 payload 기준으로 조치 우선순위를 요약해줘.",
       "expected_answer": "LOT-C-2409가 defect_rate 0.0323으로 가장 높아 최우선이다. 그 다음 LOT-C-2408과 LOT-C-2406이 0.028 이상이므로 C라인 설비 조건, jig 고정, 금형 edge와 냉각수 유량을 먼저 점검한다.",
-      "must_include": ["LOT-C-2409", "LOT-C-2408", "LOT-C-2406", "C라인"]
+      "must_include": [
+        "LOT-C-2409",
+        "LOT-C-2408",
+        "LOT-C-2406",
+        "C라인"
+      ]
     }
   ]
 }
