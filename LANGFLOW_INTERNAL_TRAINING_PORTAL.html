@@ -1268,7 +1268,7 @@
 
     .module-strip {
       display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 12px;
       max-width: 100%;
       min-width: 0;
@@ -1276,7 +1276,7 @@
 
     .module {
       min-width: 0;
-      min-height: 116px;
+      min-height: 132px;
       padding: 14px;
       border-radius: var(--radius);
       border: 1px solid var(--line);
@@ -1620,6 +1620,74 @@
     .source-pill svg {
       width: 14px;
       height: 14px;
+    }
+
+    .source-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.45;
+    }
+
+    .source-links span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .source-links a,
+    .visual-body small a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 8px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #f8fbff;
+      color: #315adf;
+      font-weight: 800;
+      text-decoration: none;
+      overflow-wrap: anywhere;
+    }
+
+    .source-links a:hover,
+    .visual-body small a:hover {
+      border-color: rgba(49, 90, 223, 0.34);
+      background: #eef4ff;
+      color: #1c43b5;
+    }
+
+    .definition-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .definition-item {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #f8fbff;
+    }
+
+    .definition-item b {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--ink);
+      font-size: 0.94rem;
+    }
+
+    .definition-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.62;
     }
 
     .library-map {
@@ -2037,6 +2105,7 @@
       .visual-gallery,
       .option-demo,
       .research-grid,
+      .definition-grid,
       .process-columns,
       .library-map {
         grid-template-columns: 1fr;
@@ -2222,6 +2291,8 @@
         <li><a href="#community-patterns"><i data-lucide="radar"></i>커뮤니티 패턴</a></li>
         <li><a href="#recipes"><i data-lucide="file-code-2"></i>공통 컴포넌트</a></li>
         <li><a href="#flow-patterns"><i data-lucide="workflow"></i>Flow 패턴</a></li>
+        <li><a href="#branch-routing"><i data-lucide="git-branch"></i>분기 처리</a></li>
+        <li><a href="#mcp-integration"><i data-lucide="plug-zap"></i>MCP 연동</a></li>
         <li><a href="#validation"><i data-lucide="shield-check"></i>검증 체크리스트</a></li>
         <li><a href="#sources"><i data-lucide="book-open"></i>참고 문서</a></li>
       </ul>
@@ -2230,6 +2301,8 @@
         <a href="https://docs.langflow.org/components-custom-components" target="_blank" rel="noopener noreferrer">Custom components</a><br />
         <a href="https://docs.langflow.org/data-types" target="_blank" rel="noopener noreferrer">Data types</a><br />
         <a href="https://docs.langflow.org/read-file" target="_blank" rel="noopener noreferrer">Read File</a><br />
+        <a href="https://docs.langflow.org/mcp-client" target="_blank" rel="noopener noreferrer">MCP client</a><br />
+        <a href="https://docs.langflow.org/mcp-server" target="_blank" rel="noopener noreferrer">MCP server</a><br />
         <a href="https://docs.langflow.org/concepts-file-management" target="_blank" rel="noopener noreferrer">File management</a>
       </div>
     </aside>
@@ -2271,7 +2344,7 @@
                 </div>
                 <div class="track-row">
                   <div class="track-index">03</div>
-                  <div><strong>업무 flow로 조립</strong><span>RAG, tool-using agent, 데이터 분석, 문서 추출, subflow orchestration을 설계합니다.</span></div>
+                  <div><strong>업무 flow로 조립</strong><span>RAG, 데이터 분석, 문서 추출, 조건 분기, MCP 연동, subflow orchestration을 설계합니다.</span></div>
                 </div>
               </div>
             </div>
@@ -2366,13 +2439,13 @@ class HelloCompanyNode(Component):
           <div class="panel">
             <h3>작성 규칙</h3>
             <div class="module-strip">
-              <div class="module"><b>1. 책임 선언</b><span>한 문장 description</span></div>
-              <div class="module"><b>2. 입력 명세</b><span>name, display_name, required</span></div>
-              <div class="module"><b>3. 출력 타입</b><span>Data / Message / DataFrame</span></div>
-              <div class="module"><b>4. 정규화</b><span>dict, Data, text 입력을 모두 처리</span></div>
-              <div class="module"><b>5. 오류 payload</b><span>success=false, errors</span></div>
-              <div class="module"><b>6. 상태 메시지</b><span>self.status</span></div>
-              <div class="module"><b>7. 검증</b><span>compile, import, UI 실행</span></div>
+              <div class="module"><b>1. 역할 설명</b><span>`description`에 이 node가 하는 일을 한 문장으로 씁니다. 예: “CSV 파일을 표준 Data payload로 변환합니다.”</span></div>
+              <div class="module"><b>2. 입력 명세</b><span>`name`, `display_name`, `info`, `required`, 기본값을 정합니다. 예: `dataset_key`, `limit=100`.</span></div>
+              <div class="module"><b>3. 출력 계약</b><span>`Output(types=[...], method=...)`와 실제 return 타입을 맞춥니다. 예: `return Data(data=result)`.</span></div>
+              <div class="module"><b>4. 값 정리</b><span>빈 문자열, `Data`, `Message`, list처럼 들어올 수 있는 값을 method 안에서 표준 dict/text로 맞춥니다.</span></div>
+              <div class="module"><b>5. 실패 응답</b><span>실패해도 downstream이 읽을 수 있게 `success=False`, `errors=[...]` 형태로 반환합니다.</span></div>
+              <div class="module"><b>6. 화면 상태</b><span>`self.status`에는 “Loaded 25 rows”처럼 짧은 상태만 남기고 token, 원문 payload는 넣지 않습니다.</span></div>
+              <div class="module"><b>7. 검증</b><span>코드창 import, 한 번 실행, 다음 node 연결까지 확인합니다. 예: Data output을 Chat Output에 먼저 연결.</span></div>
             </div>
           </div>
 
@@ -2381,10 +2454,10 @@ class HelloCompanyNode(Component):
             <p>아래 항목은 별도 기능처럼 외워두기보다 component class를 작성할 때 처음부터 같이 설계하는 기준입니다.</p>
             <ol class="process-steps" aria-label="custom component operational points">
               <li><span class="step-index">01</span><span><b>Dynamic field</b><em>`real_time_refresh=True`와 `update_build_config`로 선택값에 따라 필요한 입력만 보여줍니다. 예: bearer 인증일 때만 API key field 표시.</em></span></li>
-              <li><span class="step-index">02</span><span><b>Tool Mode</b><em>Agent가 직접 채워야 하는 짧은 argument에만 `tool_mode=True`를 붙입니다. secret, 대용량 payload, 내부 설정값에는 붙이지 않습니다.</em></span></li>
+              <li><span class="step-index">02</span><span><b>Tool Mode</b><em>고정 flow가 아니라 Agent가 “필요할 때 이 component를 tool처럼 호출”해야 하는 경우에 씁니다. Agent가 직접 채울 질문, dataset_key, route, limit 같은 짧은 argument에만 `tool_mode=True`를 붙입니다.</em></span></li>
               <li><span class="step-index">03</span><span><b>`group_outputs=True`</b><em>본 출력과 debug/manifest/branch 출력을 동시에 연결해야 할 때 사용합니다. 비활성 branch도 downstream이 읽을 수 있는 payload를 반환합니다.</em></span></li>
               <li><span class="step-index">04</span><span><b>`self.status`</b><em>UI 카드에서 마지막 실행 상태를 빠르게 읽도록 짧고 민감정보 없는 메시지만 남깁니다.</em></span></li>
-              <li><span class="step-index">05</span><span><b>`data_ref`</b><em>대용량 rows를 prompt/state에 계속 싣지 않고 저장소 참조, row_count, columns, preview 중심으로 넘깁니다.</em></span></li>
+              <li><span class="step-index">05</span><span><b>실행 전 값 보정</b><em>`IntInput`, `FloatInput`, `DropdownInput` 기본값만 믿지 말고 method 안에서 범위, 빈값, 허용 목록을 한 번 더 확인합니다.</em></span></li>
             </ol>
           </div>
 
@@ -2403,8 +2476,8 @@ class HelloCompanyNode(Component):
                 </div>
                 <div class="mock-node-body">
                   <div class="mock-input">
-                    <label><span>Use Vision Summary</span><span>BoolInput</span></label>
-                    <div class="mock-control"><span>이미지/차트 설명 생성</span><span class="mock-toggle"></span></div>
+                    <label><span>Include Debug</span><span>BoolInput</span></label>
+                    <div class="mock-control"><span>디버그 payload 포함</span><span class="mock-toggle"></span></div>
                   </div>
                   <div class="mock-input">
                     <label><span>Parse Mode</span><span>DropdownInput</span></label>
@@ -2423,9 +2496,9 @@ class HelloCompanyNode(Component):
 
               <ul class="option-list">
                 <li><b>`advanced=True`</b>자주 바꾸지 않는 timeout, debug, retry, threshold는 기본 화면에서 숨기고 inspect panel/advanced 영역으로 보냅니다.</li>
-                <li><b>`real_time_refresh=True`</b>값이 바뀌는 즉시 `update_build_config`가 호출되어 다른 field의 `show`, `required`, `advanced`, `options`를 바꿀 수 있습니다.</li>
+                <li><b>`real_time_refresh=True`</b>이 input의 값 변경을 “설정 화면을 다시 계산해야 하는 이벤트”로 표시합니다. 이 옵션이 붙은 field가 바뀌면 Langflow UI가 실행 함수가 아니라 `update_build_config(...)` hook을 호출합니다.</li>
                 <li><b>`dynamic=True` + `show=False`</b>처음에는 숨기고, 특정 dropdown/boolean 선택에서만 나타나는 조건부 field에 씁니다.</li>
-                <li><b>`tool_mode=True`</b>Agent가 채워 넣어야 하는 argument에만 붙입니다. 공식 문서 기준 Tool Mode는 `DataInput`, `DataFrameInput`, `PromptInput`, `MessageTextInput`, `MultilineInput`, `DropdownInput`에서 사용합니다.</li>
+                <li><b>`tool_mode=True`</b>이 component를 Agent tool로 노출할 때, Agent가 직접 채워도 되는 입력값에만 붙입니다. 고정 flow에서 사람이 설정하는 값이나 secret에는 붙이지 않습니다.</li>
               </ul>
             </div>
 
@@ -2438,46 +2511,35 @@ class HelloCompanyNode(Component):
 from lfx.io import BoolInput, DropdownInput, FloatInput, IntInput, Output
 from lfx.schema import Data
 
-def _clamp_int(value, default, minimum, maximum):
-    try:
-        number = int(value)
-    except Exception:
-        number = default
-    return max(minimum, min(maximum, number))
-
-def _clamp_float(value, default, minimum, maximum):
-    try:
-        number = float(value)
-    except Exception:
-        number = default
-    return max(minimum, min(maximum, number))
 
 class DocumentLoaderSettings(Component):
     display_name = "Document Loader Settings"
-    description = "Demonstrates practical runtime options for document flows."
+    description = "Build a small settings payload for document flows."
     icon = "Settings2"
     name = "DocumentLoaderSettings"
 
     inputs = [
-        BoolInput(
-            name="use_vision_summary",
-            display_name="Use Vision Summary",
-            info="PDF/PPT의 이미지, 차트, 도면 설명을 vision LLM으로 만들지 결정합니다.",
-            value=False,
-            real_time_refresh=True,  # 값 변경 시 update_build_config가 다시 호출됩니다.
-        ),
         DropdownInput(
             name="parse_mode",
             display_name="Parse Mode",
-            info="문서를 어떤 방식으로 해석할지 선택합니다.",
+            info="문서를 읽는 방식을 고릅니다. multimodal이면 vision 설정이 추가로 필요합니다.",
             options=["text_only", "ocr", "multimodal"],
             value="text_only",
-            real_time_refresh=True,  # 선택값에 따라 다른 옵션을 보이거나 숨깁니다.
+            # 이 field가 바뀌면 Langflow UI가 update_build_config를 호출합니다.
+            # 즉, 실행 함수가 도는 것이 아니라 설정 화면을 다시 그릴 기회를 주는 옵션입니다.
+            real_time_refresh=True,
+        ),
+        BoolInput(
+            name="include_debug",
+            display_name="Include Debug",
+            info="결과 payload에 설정 원문을 함께 넣을지 결정합니다.",
+            value=False,
+            advanced=True,
         ),
         IntInput(
             name="max_pages",
             display_name="Max Pages",
-            info="한 번에 처리할 최대 페이지 수입니다. 실행 함수에서 다시 보정합니다.",
+            info="한 번에 처리할 최대 페이지 수입니다.",
             value=30,
             advanced=True,
         ),
@@ -2491,7 +2553,7 @@ class DocumentLoaderSettings(Component):
         DropdownInput(
             name="vision_model_profile",
             display_name="Vision Model Profile",
-            info="multimodal 또는 vision summary 사용 시에만 필요합니다.",
+            info="parse_mode가 multimodal일 때만 필요한 설정입니다.",
             options=["fast", "balanced", "accurate"],
             value="balanced",
             dynamic=True,
@@ -2504,41 +2566,49 @@ class DocumentLoaderSettings(Component):
     ]
 
     def update_build_config(self, build_config: dict, field_value, field_name: str | None = None) -> dict:
-        # vision이 필요한 상황이면 vision_model_profile을 즉시 화면에 노출합니다.
-        if field_name in {"use_vision_summary", "parse_mode"}:
-            use_vision = (
-                field_value is True
-                or field_value == "multimodal"
-                or build_config.get("use_vision_summary", {}).get("value") is True
-                or build_config.get("parse_mode", {}).get("value") == "multimodal"
-            )
-            build_config["vision_model_profile"]["show"] = use_vision
-            build_config["vision_model_profile"]["required"] = use_vision
-
-            # multimodal을 선택하면 선택지를 vision 중심으로 좁혀 UI 실수를 줄입니다.
-            if use_vision:
-                build_config["parse_mode"]["options"] = ["ocr", "multimodal"]
-            else:
-                build_config["parse_mode"]["options"] = ["text_only", "ocr", "multimodal"]
-
+        # real_time_refresh=True가 붙은 parse_mode가 바뀔 때 이 hook이 호출됩니다.
+        # 여기서는 multimodal을 선택한 경우에만 vision_model_profile field를 보여줍니다.
+        if field_name == "parse_mode":
+            needs_vision = field_value == "multimodal"
+            build_config["vision_model_profile"]["show"] = needs_vision
+            build_config["vision_model_profile"]["required"] = needs_vision
         return build_config
 
     def build_settings(self) -> Data:
-        # UI 값은 사용자가 바꿀 수 있으므로 실행 직전에도 범위를 보정합니다.
-        max_pages = _clamp_int(self.max_pages, 30, 1, 300)
-        threshold = _clamp_float(self.similarity_threshold, 0.72, 0.0, 1.0)
+        # UI 입력은 실행 직전에 한 번 더 보정합니다.
+        try:
+            max_pages = int(self.max_pages or 30)
+        except Exception:
+            max_pages = 30
+        max_pages = max(1, min(max_pages, 300))
+
+        try:
+            threshold = float(self.similarity_threshold or 0.72)
+        except Exception:
+            threshold = 0.72
+        threshold = max(0.0, min(threshold, 1.0))
 
         result = {
             "success": True,
             "parse_mode": self.parse_mode,
-            "use_vision_summary": bool(self.use_vision_summary),
-            "vision_model_profile": self.vision_model_profile if self.use_vision_summary else None,
             "max_pages": max_pages,
             "similarity_threshold": threshold,
+            "vision_model_profile": self.vision_model_profile if self.parse_mode == "multimodal" else None,
             "errors": [],
         }
+        if self.include_debug is True:
+            result["debug"] = {"selected_parse_mode": self.parse_mode}
+
         self.status = f"mode={self.parse_mode}, pages={max_pages}, threshold={threshold}"
         return Data(data=result)</code></pre>
+            </div>
+            <div class="callout" style="margin-top:14px">
+              <strong>`real_time_refresh=True` 읽는 순서</strong>
+              <p>
+                1) 사용자가 `parse_mode` 값을 바꿉니다. 2) Langflow UI가 이 field에 `real_time_refresh=True`가 있음을 보고
+                `update_build_config(...)`를 호출합니다. 3) 그 hook 안에서 `vision_model_profile`의 `show/required`를 바꿉니다.
+                실제 문서 처리나 LLM 호출은 여기서 하지 않고, 사용자가 node를 실행할 때 `build_settings()`에서 처리합니다.
+              </p>
             </div>
           </div>
         </section>
@@ -2925,8 +2995,8 @@ class DocumentLoaderSettings(Component):
                   <tr>
                     <td>`real_time_refresh`</td>
                     <td>Input</td>
-                    <td>값이 바뀔 때 `update_build_config()`를 다시 호출합니다.</td>
-                    <td>선택값에 따라 다른 field를 보이거나 숨길 때만 씁니다.</td>
+                    <td>이 입력값 변경 시 설정 화면을 다시 계산해야 한다고 Langflow UI에 알립니다.</td>
+                    <td>`update_build_config(...)`에서 다른 field의 `show`, `required`, `options`를 바꿀 때만 씁니다.</td>
                   </tr>
                   <tr>
                     <td>`dynamic`, `show`</td>
@@ -2937,8 +3007,8 @@ class DocumentLoaderSettings(Component):
                   <tr>
                     <td>`tool_mode`</td>
                     <td>일부 Input</td>
-                    <td>Agent가 tool 호출 시 채울 argument로 노출합니다.</td>
-                    <td>사용자 질문, route, limit처럼 Agent가 채워도 되는 값에만 붙입니다.</td>
+                    <td>component를 Agent tool로 쓸 때 Agent가 채울 argument로 노출합니다.</td>
+                    <td>사람이 미리 고정하는 설정값이 아니라 질문, route, limit처럼 Agent가 판단해 넣을 값에만 붙입니다.</td>
                   </tr>
                   <tr>
                     <td>`types`</td>
@@ -3149,7 +3219,7 @@ class InputOutputContractExample(Component):
                 <figcaption class="visual-body">
                   <h3>Chat Input / Chat Output</h3>
                   <p>Chat Input이 사용자의 text를 `Message`로 만들고, Language Model의 `Model Response`가 Chat Output으로 들어가는 가장 기본적인 대화 flow입니다.</p>
-                  <small>Source: Langflow Chat Input and Output documentation</small>
+                  <small>Source: <a href="https://docs.langflow.org/chat-input-and-output" target="_blank" rel="noopener noreferrer">Langflow Chat Input and Output documentation</a></small>
                 </figcaption>
               </figure>
               <figure class="visual-card">
@@ -3157,7 +3227,7 @@ class InputOutputContractExample(Component):
                 <figcaption class="visual-body">
                   <h3>Prompt Template 변수 input</h3>
                   <p>Prompt 안에 `{context}`, `{question}` 같은 변수를 쓰면 component에 같은 이름의 input field가 생깁니다. 질문과 검색 근거를 따로 연결할 때 자주 씁니다.</p>
-                  <small>Source: Langflow Components overview documentation</small>
+                  <small>Source: <a href="https://docs.langflow.org/concepts-components" target="_blank" rel="noopener noreferrer">Langflow Components overview documentation</a></small>
                 </figcaption>
               </figure>
               <figure class="visual-card">
@@ -3165,7 +3235,7 @@ class InputOutputContractExample(Component):
                 <figcaption class="visual-body">
                   <h3>Structured Output</h3>
                   <p>자유 답변 대신 정해진 schema의 `JSON/Table`을 만들 때 씁니다. 문서 추출, 보고서 필드 추출, 품질 점검 결과 구조화에 적합합니다.</p>
-                  <small>Source: Langflow Structured Output documentation</small>
+                  <small>Source: <a href="https://docs.langflow.org/structured-output" target="_blank" rel="noopener noreferrer">Langflow Structured Output documentation</a></small>
                 </figcaption>
               </figure>
               <figure class="visual-card">
@@ -3173,7 +3243,7 @@ class InputOutputContractExample(Component):
                 <figcaption class="visual-body">
                   <h3>Type Convert</h3>
                   <p>앞 노드의 output이 다음 노드 input 타입과 맞지 않을 때 중간에 둡니다. 예시처럼 `Table` 검색 결과를 `Message`로 바꿔 Prompt에 넣을 수 있습니다.</p>
-                  <small>Source: Langflow Type Convert documentation</small>
+                  <small>Source: <a href="https://docs.langflow.org/type-convert" target="_blank" rel="noopener noreferrer">Langflow Type Convert documentation</a></small>
                 </figcaption>
               </figure>
               <figure class="visual-card">
@@ -3181,7 +3251,7 @@ class InputOutputContractExample(Component):
                 <figcaption class="visual-body">
                   <h3>JSON Operations</h3>
                   <p>Webhook/API/custom component가 만든 `JSON/Data`에서 key를 고르거나 필터링합니다. 여러 개를 체인으로 이어 간단한 payload 정리를 할 수 있습니다.</p>
-                  <small>Source: Langflow JSON Operations documentation</small>
+                  <small>Source: <a href="https://docs.langflow.org/data-operations" target="_blank" rel="noopener noreferrer">Langflow JSON Operations documentation</a></small>
                 </figcaption>
               </figure>
               <figure class="visual-card">
@@ -3189,7 +3259,7 @@ class InputOutputContractExample(Component):
                 <figcaption class="visual-body">
                   <h3>Agent</h3>
                   <p>Agent는 사용자 `Message`, `LanguageModel`, `Tools`를 함께 받아 필요한 tool을 골라 실행합니다. Tool output은 일반 Data가 아니라 Agent Tools input으로 연결합니다.</p>
-                  <small>Source: Langflow Components overview documentation</small>
+                  <small>Source: <a href="https://docs.langflow.org/concepts-components" target="_blank" rel="noopener noreferrer">Langflow Components overview documentation</a></small>
                 </figcaption>
               </figure>
             </div>
@@ -3396,7 +3466,7 @@ class InputOutputContractExample(Component):
               <figcaption class="visual-body">
                 <h3>Read File / Split Text / Vector Store</h3>
                 <p>파일 적재 flow에서는 문서 읽기와 chunking을 먼저 끝내고 vector DB에 저장합니다. 질문 runtime에서 매번 파일을 다시 읽지 않는 것이 운영상 편합니다.</p>
-                <small>Source: Langflow Vector RAG tutorial</small>
+                <small>Source: <a href="https://docs.langflow.org/chat-with-rag" target="_blank" rel="noopener noreferrer">Langflow Vector RAG tutorial</a></small>
               </figcaption>
             </figure>
             <figure class="visual-card">
@@ -3404,7 +3474,7 @@ class InputOutputContractExample(Component):
               <figcaption class="visual-body">
                 <h3>Chat Input / Retriever / Prompt / LLM</h3>
                 <p>사용자 질문 flow에서는 Chat Input의 질문이 embedding과 prompt 양쪽에 쓰이고, vector search 결과가 Parser/Prompt를 거쳐 LLM context가 됩니다.</p>
-                <small>Source: Langflow Vector RAG tutorial</small>
+                <small>Source: <a href="https://docs.langflow.org/chat-with-rag" target="_blank" rel="noopener noreferrer">Langflow Vector RAG tutorial</a></small>
               </figcaption>
             </figure>
             <figure class="visual-card">
@@ -3412,7 +3482,7 @@ class InputOutputContractExample(Component):
               <figcaption class="visual-body">
                 <h3>Structured Output / Parser</h3>
                 <p>정해진 JSON/Table로 추출한 뒤 Parser로 사람이 읽는 Message를 만듭니다. 문서 추출, 계약서 필드 추출, 보고서 요약에 자주 쓰입니다.</p>
-                <small>Source: Langflow Parser documentation</small>
+                <small>Source: <a href="https://docs.langflow.org/parser" target="_blank" rel="noopener noreferrer">Langflow Parser documentation</a></small>
               </figcaption>
             </figure>
             <figure class="visual-card">
@@ -3420,7 +3490,7 @@ class InputOutputContractExample(Component):
               <figcaption class="visual-body">
                 <h3>Loop / Item / Looping / Done</h3>
                 <p>Loop는 직선 연결이 아니라 item 처리 branch가 다시 Looping으로 돌아오는 구조입니다. 모든 item이 끝나면 Done output에서 결과를 받습니다.</p>
-                <small>Source: Langflow Loop documentation</small>
+                <small>Source: <a href="https://docs.langflow.org/loop" target="_blank" rel="noopener noreferrer">Langflow Loop documentation</a></small>
               </figcaption>
             </figure>
           </div>
@@ -3441,7 +3511,7 @@ class InputOutputContractExample(Component):
               <figcaption class="visual-body">
                 <h3>Simple Agent 기본 연결</h3>
                 <p>Chat Input의 Message가 Agent input으로 들어가고, URL/Calculator의 Toolset이 Agent Tools로 들어갑니다. Agent Response는 Chat Output으로 연결됩니다.</p>
-                <small>Source: Langflow Quickstart, Simple Agent template</small>
+                <small>Source: <a href="https://docs.langflow.org/get-started-quickstart" target="_blank" rel="noopener noreferrer">Langflow Quickstart, Simple Agent template</a></small>
               </figcaption>
             </figure>
 
@@ -3450,7 +3520,7 @@ class InputOutputContractExample(Component):
               <figcaption class="visual-body">
                 <h3>Run Flow를 Agent tool로 연결</h3>
                 <p>하위 flow를 Run Flow component로 감싼 뒤 Toolset output을 Agent Tools input에 연결합니다. 큰 업무는 subflow로 쪼개고 상위 agent가 호출하게 만들 때 유용합니다.</p>
-                <small>Source: Langflow Configure tools for agents</small>
+                <small>Source: <a href="https://docs.langflow.org/agents-tools" target="_blank" rel="noopener noreferrer">Langflow Configure tools for agents</a></small>
               </figcaption>
             </figure>
 
@@ -3459,7 +3529,7 @@ class InputOutputContractExample(Component):
               <figcaption class="visual-body">
                 <h3>Structured Output → Parser → Chat Output</h3>
                 <p>File/LLM 입력으로 structured data를 만들고, Parser가 JSON/Table을 Message로 바꾼 뒤 Chat Output으로 보냅니다. 구조화 추출 flow의 대표 연결입니다.</p>
-                <small>Source: Langflow Parser documentation</small>
+                <small>Source: <a href="https://docs.langflow.org/parser" target="_blank" rel="noopener noreferrer">Langflow Parser documentation</a></small>
               </figcaption>
             </figure>
 
@@ -3468,7 +3538,7 @@ class InputOutputContractExample(Component):
               <figcaption class="visual-body">
                 <h3>Playground에서 tool 입출력 확인</h3>
                 <p>Agent가 어떤 tool을 호출했고 input/output이 무엇이었는지 Playground에서 확인합니다. flow 검증은 최종 답변만 보지 말고 중간 tool payload까지 봅니다.</p>
-                <small>Source: Langflow Quickstart, Playground with Agent tool</small>
+                <small>Source: <a href="https://docs.langflow.org/get-started-quickstart" target="_blank" rel="noopener noreferrer">Langflow Quickstart, Playground with Agent tool</a></small>
               </figcaption>
             </figure>
 
@@ -3477,7 +3547,7 @@ class InputOutputContractExample(Component):
               <figcaption class="visual-body">
                 <h3>RAG Load Data Flow</h3>
                 <p>File → Split Text → Embedding Model → Vector Store로 이어지는 ingestion 전용 flow입니다. 사내 문서 지식화는 이 흐름을 표준 template로 만드는 것이 좋습니다.</p>
-                <small>Source: Langflow Vector RAG tutorial</small>
+                <small>Source: <a href="https://docs.langflow.org/chat-with-rag" target="_blank" rel="noopener noreferrer">Langflow Vector RAG tutorial</a></small>
               </figcaption>
             </figure>
 
@@ -3486,7 +3556,7 @@ class InputOutputContractExample(Component):
               <figcaption class="visual-body">
                 <h3>RAG Retriever Flow</h3>
                 <p>Chat Input → Embedding → Vector Store → Parser → Prompt → Language Model → Chat Output으로 이어집니다. 검색 결과를 바로 LLM에 넣지 않고 Parser/Prompt로 정리하는 점을 봅니다.</p>
-                <small>Source: Langflow Vector RAG tutorial</small>
+                <small>Source: <a href="https://docs.langflow.org/chat-with-rag" target="_blank" rel="noopener noreferrer">Langflow Vector RAG tutorial</a></small>
               </figcaption>
             </figure>
 
@@ -3495,7 +3565,7 @@ class InputOutputContractExample(Component):
               <figcaption class="visual-body">
                 <h3>Docling 문서 처리 Flow</h3>
                 <p>PDF/문서 처리, Markdown 변환, chunking, vector store 적재를 묶는 문서 지능 flow입니다. 사내 문서 AI에는 file parser와 chunker를 공통화합니다.</p>
-                <small>Source: Langflow Docling bundle documentation</small>
+                <small>Source: <a href="https://docs.langflow.org/bundles-docling" target="_blank" rel="noopener noreferrer">Langflow Docling bundle documentation</a></small>
               </figcaption>
             </figure>
 
@@ -3504,7 +3574,7 @@ class InputOutputContractExample(Component):
               <figcaption class="visual-body">
                 <h3>Loop component로 row 반복 처리</h3>
                 <p>File/Table 입력을 Loop가 row 단위 JSON으로 나누고, 각 item을 Type Convert/Structured Output으로 처리한 뒤 Done port에서 결과를 모읍니다.</p>
-                <small>Source: Langflow Loop documentation, CSV parser example</small>
+                <small>Source: <a href="https://docs.langflow.org/loop" target="_blank" rel="noopener noreferrer">Langflow Loop documentation, CSV parser example</a></small>
               </figcaption>
             </figure>
 
@@ -3513,7 +3583,7 @@ class InputOutputContractExample(Component):
               <figcaption class="visual-body">
                 <h3>조건부 반복은 Loop 앞에서 분리</h3>
                 <p>공식 문서 기준 If-Else는 Loop와 직접 호환되지 않습니다. 조건이 필요하면 Table Operations 등으로 데이터를 먼저 나누고 각각 Loop를 실행합니다.</p>
-                <small>Source: Langflow Loop documentation, conditional looping example</small>
+                <small>Source: <a href="https://docs.langflow.org/loop" target="_blank" rel="noopener noreferrer">Langflow Loop documentation, conditional looping example</a></small>
               </figcaption>
             </figure>
 
@@ -3522,7 +3592,7 @@ class InputOutputContractExample(Component):
               <figcaption class="visual-body">
                 <h3>Enterprise Multi-step Agent</h3>
                 <p>실무 agent는 단순 Q&A보다 여러 tool/API를 순서대로 호출하고 조건/오류를 처리하는 자동화에 가깝습니다. Policy gate, audit, approval을 함께 설계합니다.</p>
-                <small>Source: Langflow blog, Robust Enterprise AI Agent workflow with CUGA</small>
+                <small>Source: <a href="https://www.langflow.org/blog/robust-enterprise-ai-agent-workflow-langflow-cuga" target="_blank" rel="noopener noreferrer">Langflow blog, Robust Enterprise AI Agent workflow with CUGA</a></small>
               </figcaption>
             </figure>
           </div>
@@ -3545,31 +3615,37 @@ class InputOutputContractExample(Component):
               <span class="source-pill"><i data-lucide="book-open"></i>Official</span>
               <h3>RAG는 ingestion과 retrieval을 분리</h3>
               <p>공식 Vector Store RAG 튜토리얼은 파일을 쪼개고 embedding/vector store에 적재하는 Load Data Flow와, 질문을 받아 검색/답변하는 Retriever Flow를 분리합니다.</p>
+              <div class="source-links"><span>출처</span><a href="https://docs.langflow.org/chat-with-rag" target="_blank" rel="noopener noreferrer">Langflow Vector RAG</a></div>
             </div>
             <div class="research-card">
               <span class="source-pill"><i data-lucide="github"></i>GitHub</span>
               <h3>템플릿 카테고리는 업무 단위로 정리</h3>
               <p>커뮤니티 template 저장소는 AI pattern, customer support, data analytics, finance, HR, operations, sales/marketing, developer productivity처럼 업무 영역별로 flow를 나눕니다.</p>
+              <div class="source-links"><span>출처</span><a href="https://github.com/Empreiteiro/langflow-templates" target="_blank" rel="noopener noreferrer">langflow-templates</a></div>
             </div>
             <div class="research-card">
               <span class="source-pill"><i data-lucide="package"></i>Bundles</span>
               <h3>공통 component는 connector와 processor 중심</h3>
               <p>공식 bundle 문서와 커뮤니티 component 저장소는 외부 서비스 connector, 파일/문서 처리, table/json 변환, LLM helper, generator 계열 component를 반복적으로 다룹니다.</p>
+              <div class="source-links"><span>출처</span><a href="https://docs.langflow.org/bundles-docling" target="_blank" rel="noopener noreferrer">Langflow Bundles</a><a href="https://github.com/Empreiteiro/langflow-factory" target="_blank" rel="noopener noreferrer">langflow-factory</a></div>
             </div>
             <div class="research-card">
               <span class="source-pill"><i data-lucide="flask-conical"></i>Playground</span>
               <h3>작은 flow부터 실행해 연결을 확인</h3>
               <p>공식 Playground 문서는 Chat Input에서 시작해 Chat Output까지 실제 메시지가 흐르는지 먼저 확인한 뒤, 파일/도구/vector store를 붙이는 방식을 권장합니다.</p>
+              <div class="source-links"><span>출처</span><a href="https://docs.langflow.org/concepts-playground" target="_blank" rel="noopener noreferrer">Langflow Playground</a></div>
             </div>
             <div class="research-card">
               <span class="source-pill"><i data-lucide="workflow"></i>Enterprise</span>
               <h3>실무 agent는 multi-step automation</h3>
               <p>enterprise workflow 사례는 task decomposition, multi-tool sequencing, aggregation, conditional logic, retry/error handling, structured output을 핵심 요구로 봅니다.</p>
+              <div class="source-links"><span>출처</span><a href="https://www.langflow.org/blog/robust-enterprise-ai-agent-workflow-langflow-cuga" target="_blank" rel="noopener noreferrer">Langflow CUGA blog</a></div>
             </div>
             <div class="research-card">
               <span class="source-pill"><i data-lucide="git-branch"></i>DevOps</span>
               <h3>flow도 template와 JSON 자산으로 관리</h3>
               <p>공식 template contribution 문서는 template 이름, 설명, 아이콘, README/Note, screenshot을 요구합니다. 사내에서도 flow 산출물을 버전 관리 대상으로 봐야 합니다.</p>
+              <div class="source-links"><span>출처</span><a href="https://github.com/langflow-ai/langflow/blob/main/docs/docs/Contributing/contributing-templates.mdx" target="_blank" rel="noopener noreferrer">Template contribution guide</a></div>
             </div>
           </div>
 
@@ -3712,7 +3788,7 @@ class InputOutputContractExample(Component):
                 <h3>Document Loader Settings</h3>
                 <p>`BoolInput`, `IntInput`, `FloatInput`, `DropdownInput`, `real_time_refresh`, `dynamic` field를 한 번에 보여주는 운영 설정 예제입니다.</p>
                 <div class="recipe-io">
-                  <div><b>Input</b> `use_vision_summary`, `parse_mode`, `max_pages`, `similarity_threshold`, `vision_model_profile`처럼 실행 정책을 정하는 설정값입니다.</div>
+                  <div><b>Input</b> `parse_mode`, `include_debug`, `max_pages`, `similarity_threshold`, `vision_model_profile`처럼 실행 정책을 정하는 설정값입니다.</div>
                   <div><b>Output</b> `settings`는 `Data` 타입이며 문서 처리 flow의 downstream custom component에 그대로 넘길 수 있는 설정 payload입니다.</div>
                 </div>
               </div>
@@ -3802,7 +3878,7 @@ class InputOutputContractExample(Component):
                   <tr>
                     <td><a href="examples/document_loader_settings.py">Document Loader Settings</a></td>
                     <td>연결 input 없이 설정 payload를 만드는 component입니다. 다른 노드에서 값을 받기보다 운영자가 화면에서 값을 정합니다.</td>
-                    <td>`use_vision_summary`, `parse_mode`는 `real_time_refresh=True`로 바뀌는 즉시 field 표시가 갱신됩니다. `vision_model_profile`은 `dynamic=True`라 필요한 경우에만 보입니다.</td>
+                    <td>`parse_mode`는 `real_time_refresh=True`라 값이 바뀌면 `update_build_config`가 호출됩니다. `vision_model_profile`은 `dynamic=True`라 `multimodal`을 고른 경우에만 보입니다.</td>
                     <td>`settings`는 `Data`입니다. parse mode, page limit, threshold, vision profile 같은 운영 설정을 한 payload로 묶습니다.</td>
                     <td>문서 처리 custom component나 Prompt context에 설정값을 넘길 때 씁니다. 직접 연결할 input이 없다면 같은 값을 downstream component 설정에 복사해도 됩니다.</td>
                   </tr>
@@ -4632,7 +4708,7 @@ class InputOutputContractExample(Component):
                   <figcaption class="visual-body">
                     <h3>Vector Store RAG 전체 흐름</h3>
                     <p>파일 적재 branch와 질문 응답 branch가 같은 캔버스에 보이더라도, 운영에서는 적재 lifecycle과 runtime lifecycle을 분리해서 관리합니다.</p>
-                    <small>Source: Milvus blog, Langflow and Milvus RAG workflow</small>
+                    <small>Source: <a href="https://milvus.io/blog/drag-drop-and-deploy-how-to-build-rag-workflows-with-langflow-and-milvus.md" target="_blank" rel="noopener noreferrer">Milvus blog, Langflow and Milvus RAG workflow</a></small>
                   </figcaption>
                 </figure>
                 <figure class="visual-card">
@@ -4640,7 +4716,7 @@ class InputOutputContractExample(Component):
                   <figcaption class="visual-body">
                     <h3>Milvus component 추가</h3>
                     <p>Vector Store 목록에서 Milvus를 추가하고, 적재용/검색용 component를 각각 배치합니다. 두 component는 같은 collection을 바라보게 설정합니다.</p>
-                    <small>Source: Milvus blog, add Milvus component</small>
+                    <small>Source: <a href="https://milvus.io/blog/drag-drop-and-deploy-how-to-build-rag-workflows-with-langflow-and-milvus.md" target="_blank" rel="noopener noreferrer">Milvus blog, add Milvus component</a></small>
                   </figcaption>
                 </figure>
                 <figure class="visual-card">
@@ -4648,7 +4724,7 @@ class InputOutputContractExample(Component):
                   <figcaption class="visual-body">
                     <h3>Milvus를 ingestion/retrieval에 연결</h3>
                     <p>`embedding`, `ingest_data`, `search_query`, `search_results` port가 어떤 branch에 들어가는지 먼저 확인하면 연결 실수를 줄일 수 있습니다.</p>
-                    <small>Source: Milvus blog, connect Milvus nodes</small>
+                    <small>Source: <a href="https://milvus.io/blog/drag-drop-and-deploy-how-to-build-rag-workflows-with-langflow-and-milvus.md" target="_blank" rel="noopener noreferrer">Milvus blog, connect Milvus nodes</a></small>
                   </figcaption>
                 </figure>
                 <figure class="visual-card">
@@ -4656,7 +4732,7 @@ class InputOutputContractExample(Component):
                   <figcaption class="visual-body">
                     <h3>적재 실행 후 Playground 테스트</h3>
                     <p>문서 업로드 후 Milvus 적재 component를 실행하고, Playground에서 해당 문서에 대한 질문이 검색 근거와 함께 답변되는지 확인합니다.</p>
-                    <small>Source: Milvus blog, ingest and test</small>
+                    <small>Source: <a href="https://milvus.io/blog/drag-drop-and-deploy-how-to-build-rag-workflows-with-langflow-and-milvus.md" target="_blank" rel="noopener noreferrer">Milvus blog, ingest and test</a></small>
                   </figcaption>
                 </figure>
               </div>
@@ -4801,7 +4877,7 @@ class InputOutputContractExample(Component):
                   <figcaption class="visual-body">
                     <h3>CSV row를 item으로 반복</h3>
                     <p>공식 예시는 CSV/File 입력을 Loop에 넣고, Item output을 Type Convert와 Structured Output으로 처리한 뒤 Looping port로 되돌립니다.</p>
-                    <small>Source: Langflow Loop documentation</small>
+                    <small>Source: <a href="https://docs.langflow.org/loop" target="_blank" rel="noopener noreferrer">Langflow Loop documentation</a></small>
                   </figcaption>
                 </figure>
                 <figure class="visual-card">
@@ -4809,7 +4885,7 @@ class InputOutputContractExample(Component):
                   <figcaption class="visual-body">
                     <h3>조건 분기는 Loop 앞에서 처리</h3>
                     <p>If-Else component는 Loop와 직접 호환되지 않으므로, Table Operations 등으로 조건별 데이터를 먼저 나누고 각각 Loop를 실행합니다.</p>
-                    <small>Source: Langflow Loop documentation</small>
+                    <small>Source: <a href="https://docs.langflow.org/loop" target="_blank" rel="noopener noreferrer">Langflow Loop documentation</a></small>
                   </figcaption>
                 </figure>
               </div>
@@ -5368,10 +5444,671 @@ done_payload = {"success": True, "items": results, "row_count": len(results)}</c
           </div>
         </section>
 
+        <section id="branch-routing" data-search-block>
+          <div class="section-head">
+            <div>
+              <h2>5. 조건 분기 Flow 구현</h2>
+              <p>`route` 값에 따라 서로 다른 branch로 보내는 패턴입니다. 예를 들어 `data_retrieval`이면 데이터 조회, `document_rag`이면 문서 검색, `final_answer`이면 바로 답변 생성으로 흘러가게 만듭니다.</p>
+            </div>
+            <span class="tag">Branch</span>
+          </div>
+
+          <div class="panel">
+            <h3>왜 분기 처리를 별도 패턴으로 배우는가</h3>
+            <p class="muted-text">분기는 선을 여러 개 긋는 기능이 아니라, payload 계약을 기준으로 어떤 흐름만 활성화할지 결정하는 설계입니다. 선택되지 않은 branch도 실행될 수 있는 구조라면 downstream 첫 노드가 `active=false`, `skipped=true` payload를 무시할 수 있어야 합니다.</p>
+            <div class="grid-3">
+              <div class="card">
+                <h3>`route=data_retrieval`</h3>
+                <p>정형 데이터, CSV, DB, API 조회가 필요한 질문입니다. 예: “defect_rate가 가장 높은 lot을 찾아줘.”</p>
+              </div>
+              <div class="card">
+                <h3>`route=document_rag`</h3>
+                <p>규정, 매뉴얼, PDF, FAQ처럼 문서 근거 검색이 필요한 질문입니다. 예: “RAG 운영 기준을 알려줘.”</p>
+              </div>
+              <div class="card">
+                <h3>`route=final_answer`</h3>
+                <p>추가 조회 없이 바로 답하거나, route를 판단하지 못해 안전하게 종료하는 흐름입니다.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="pattern" data-pattern="branch-routing">
+            <div class="panel">
+              <h3>예시 Flow. Route Gate 기반 업무 분기</h3>
+              <p>사용자 요청을 route payload로 정규화한 뒤 `Route Gate`가 세 output을 동시에 노출합니다. active branch만 실제 payload를 들고, inactive branch는 `success=false`, `active=false`, `skipped=true`로 내려갑니다.</p>
+              <div class="connection-picture" aria-label="route gate branching connection picture">
+                <div class="connection-title">실제 연결 그림 <span>a/b/c 값에 따라 활성 branch만 달라집니다.</span></div>
+                <div class="map-grid three">
+                  <div class="map-lane">
+                    <div class="map-lane-title">공통 진입부</div>
+                    <div class="map-node io"><b>Chat Input</b><span>사용자 질문</span><small>output: Message</small></div>
+                    <div class="map-arrow-down">↓ request_text</div>
+                    <div class="map-node"><b>Prompt Template / Structured Output</b><span>질문을 route JSON으로 분류</span><small>output: JSON 또는 Message</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node custom"><b>Company Payload Normalizer</b><span>route, request_text, payload key 정리</span><small>output: Data</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node custom"><b>Route Gate</b><span>route 값에 맞는 branch만 active</span><small>outputs: Data per branch</small></div>
+                  </div>
+                  <div class="map-lane">
+                    <div class="map-lane-title">A. route = data_retrieval</div>
+                    <div class="map-node custom"><b>Route Gate.data_retrieval</b><span>품질/매출/재고 같은 정형 데이터 질문</span><small>active payload</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node custom"><b>Internal API Retriever / File Dataset Loader</b><span>DB/API/CSV 조회</span><small>output: Data 또는 DataFrame</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node"><b>Parser / Prompt Template</b><span>조회 결과를 답변 context로 변환</span><small>output: Message</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node io"><b>Chat Output</b><span>분석 결과 표시</span><small>input: Message / JSON</small></div>
+                  </div>
+                  <div class="map-lane">
+                    <div class="map-lane-title">B/C. document_rag 또는 final_answer</div>
+                    <div class="map-node custom"><b>Route Gate.document_rag</b><span>문서 근거가 필요한 질문</span><small>active when document_rag</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node"><b>Milvus Search / Retriever</b><span>관련 문서 chunk 검색</span><small>output: Data</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node custom"><b>Route Gate.final_answer</b><span>조회 없이 바로 답변할 질문</span><small>active when final_answer</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node io"><b>Final Prompt → Chat Output</b><span>검색 근거 또는 직접 답변 출력</span><small>input: Message</small></div>
+                  </div>
+                </div>
+                <div class="connection-lines">
+                  <div class="connection-line"><strong>1</strong><span><b>Chat Input.Message → route classifier</b>: 사용자 문장을 `{"route":"..."}` 형태로 바꿉니다. 처음에는 LLM 없이 JSON 예시를 직접 넣어도 됩니다.</span></div>
+                  <div class="connection-line"><strong>2</strong><span><b>Company Payload Normalizer.payload → Route Gate.intent_payload</b>: `route`, `request_text`, `payload`를 가진 `Data`를 Route Gate에 넣습니다.</span></div>
+                  <div class="connection-line"><strong>3</strong><span><b>Route Gate.data_retrieval → 데이터 조회 branch 첫 노드</b>: output 타입은 `Data`, input 타입은 `DataInput` 또는 `JSON/Data` 계열이어야 합니다.</span></div>
+                  <div class="connection-line"><strong>4</strong><span><b>Route Gate.document_rag → 문서 검색 branch 첫 노드</b>: query, collection, filters를 문서 검색용 payload로 넘깁니다.</span></div>
+                  <div class="connection-line"><strong>5</strong><span><b>Route Gate.final_answer → final prompt branch</b>: 조회 없이 답할 때만 활성화합니다. 잘못된 route도 여기로 보내 안전하게 닫습니다.</span></div>
+                </div>
+              </div>
+
+              <div class="implementation-list">
+                <div class="implementation-row"><b>기본 노드</b><span>Chat Input, Prompt Template, Structured Output 또는 Type Convert, Chat Output을 사용합니다. route를 LLM으로 만들 때는 Structured Output으로 `route` enum을 고정합니다.</span></div>
+                <div class="implementation-row"><b>Custom 코드</b><span>분기 node는 <a href="examples/route_gate.py">Route Gate</a>를 봅니다. 데이터 branch는 <a href="examples/internal_api_retriever.py">Internal API Retriever</a>, 문서 branch는 Milvus/RAG flow, final branch는 Prompt/LLM을 붙입니다.</span></div>
+                <div class="implementation-row"><b>운영 기준</b><span>branch 첫 노드는 `active=false` 또는 `skipped=true` payload를 받으면 외부 API/DB/LLM을 호출하지 않고 skipped 결과를 반환해야 합니다.</span></div>
+              </div>
+
+              <div class="practice-box">
+                <h4>실습 예시: 같은 Route Gate에 route 값만 바꿔 넣기</h4>
+                <div class="practice-grid">
+                  <div class="practice-item"><b>a값</b><span>`route=data_retrieval`: `quality_inspection_metrics.csv`를 조회해 LOT-C-2409 같은 정형 결과를 답합니다.</span></div>
+                  <div class="practice-item"><b>b값</b><span>`route=document_rag`: `company_faq_rag.json` 또는 PDF RAG 검색 branch로 보내 문서 근거를 답합니다.</span></div>
+                  <div class="practice-item"><b>c값</b><span>`route=final_answer`: 추가 조회 없이 “질문을 더 구체화해 달라” 같은 직접 답변을 만듭니다.</span></div>
+                  <div class="practice-item"><b>확인</b><span>세 branch를 처음에는 각각 Chat Output에 연결해 active/skipped payload가 어떻게 다른지 눈으로 봅니다.</span></div>
+                </div>
+              </div>
+
+              <div class="beginner-guide">
+                <h4>초보자가 그대로 따라 하는 연결 순서</h4>
+                <ol class="beginner-steps">
+                  <li><strong>01</strong><span><b>Route Gate만 먼저 배치</b>`examples/route_gate.py` 코드를 custom component로 등록하고 `Intent Payload` input을 확인합니다.</span></li>
+                  <li><strong>02</strong><span><b>route payload를 직접 넣어 테스트</b>아래 JSON 예시 중 하나를 `Data` 또는 `JSON` 형태로 Route Gate에 넣습니다.</span></li>
+                  <li><strong>03</strong><span><b>세 output을 Chat Output에 연결</b>`Data Retrieval`, `Document RAG`, `Final Answer` output을 각각 Chat Output에 연결해서 active branch만 payload를 갖는지 확인합니다.</span></li>
+                  <li><strong>04</strong><span><b>실제 branch 노드로 교체</b>active/skipped가 이해되면 Chat Output 대신 API retriever, Milvus retriever, final prompt 노드를 붙입니다.</span></li>
+                  <li><strong>05</strong><span><b>branch 첫 노드에 guard 적용</b>첫 custom node에서 `if not payload.get("active")`이면 바로 skipped Data를 반환하게 만듭니다.</span></li>
+                </ol>
+                <div class="code-card" data-code-collapsible>
+                  <div class="code-head">
+                    <strong>Route Gate 테스트용 payload 3개</strong>
+                    <button class="copy-button"><i data-lucide="copy"></i>복사</button>
+                  </div>
+                  <pre><code>{
+  "route": "data_retrieval",
+  "request_text": "defect_rate가 가장 높은 lot과 조치 우선순위를 알려줘",
+  "payload": {
+    "dataset": "quality_inspection_metrics",
+    "metric": "defect_rate"
+  }
+}
+
+{
+  "route": "document_rag",
+  "request_text": "RAG를 왜 문서 적재 flow와 사용자 질문 flow로 나눠야 해?",
+  "payload": {
+    "collection_name": "langflow_study_docs",
+    "top_k": 5
+  }
+}
+
+{
+  "route": "final_answer",
+  "request_text": "안녕, 오늘 실습 순서만 간단히 알려줘",
+  "payload": {}
+}</code></pre>
+                </div>
+                <div class="code-card" data-code-collapsible>
+                  <div class="code-head">
+                    <strong>branch 첫 노드에 넣는 guard 예시</strong>
+                    <button class="copy-button"><i data-lucide="copy"></i>복사</button>
+                  </div>
+                  <pre><code>payload = _payload_from_value(self.branch_payload)
+
+if payload.get("skipped") is True or payload.get("active") is False:
+    return Data(data={
+        "success": False,
+        "active": False,
+        "skipped": True,
+        "reason": "inactive branch",
+        "rows": [],
+        "errors": [],
+    })
+
+# 여기부터 실제 API/DB/Milvus/LLM 호출을 실행합니다.</code></pre>
+                </div>
+                <div class="table-wrap">
+                  <table class="beginner-table">
+                    <thead>
+                      <tr>
+                        <th>목표</th>
+                        <th>From 노드 / output</th>
+                        <th>Output 타입</th>
+                        <th>To 노드 / input</th>
+                        <th>Input 타입</th>
+                        <th>연결 기준</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>route payload 만들기</td>
+                        <td>`Structured Output` 또는 `Company Payload Normalizer` / route payload</td>
+                        <td>`JSON` 또는 `Data`</td>
+                        <td>`Route Gate` / `Intent Payload`</td>
+                        <td>`Data`, `JSON`</td>
+                        <td>가능. `route` key가 반드시 있어야 합니다.</td>
+                      </tr>
+                      <tr>
+                        <td>데이터 조회 branch</td>
+                        <td>`Route Gate` / `Data Retrieval`</td>
+                        <td>`Data`</td>
+                        <td>`Internal API Retriever` 또는 `File Dataset Loader` / payload input</td>
+                        <td>`Data`, `JSON`</td>
+                        <td>가능. branch 첫 노드가 inactive payload를 무시해야 합니다.</td>
+                      </tr>
+                      <tr>
+                        <td>문서 RAG branch</td>
+                        <td>`Route Gate` / `Document RAG`</td>
+                        <td>`Data`</td>
+                        <td>`Milvus Search` 또는 retriever / search payload</td>
+                        <td>`Data`, `JSON`, search query</td>
+                        <td>조건부. retriever 입력 schema에 맞게 query/top_k/filter를 매핑합니다.</td>
+                      </tr>
+                      <tr>
+                        <td>직접 답변 branch</td>
+                        <td>`Route Gate` / `Final Answer`</td>
+                        <td>`Data`</td>
+                        <td>`Prompt Template` 또는 final answer component / context</td>
+                        <td>`Data`, `Message`, text</td>
+                        <td>가능. 조회 없이 답할 수 있는 안내/질문 보정에 사용합니다.</td>
+                      </tr>
+                      <tr>
+                        <td>디버그 확인</td>
+                        <td>각 Route Gate output</td>
+                        <td>`Data`</td>
+                        <td>`Chat Output` / input</td>
+                        <td>`Message`, `JSON`, `Table` 허용</td>
+                        <td>처음 실습에서는 세 branch 모두 Chat Output으로 확인하면 이해가 빠릅니다.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="mcp-integration" data-search-block>
+          <div class="section-head">
+            <div>
+              <h2>6. MCP 연동과 Flow 공개</h2>
+              <p>MCP는 외부 도구를 Langflow Agent가 쓰게 하거나, 반대로 Langflow에서 만든 flow를 외부 agent/coding tool이 호출하는 tool로 제공할 때 사용합니다.</p>
+            </div>
+            <span class="tag">MCP</span>
+          </div>
+
+          <div class="panel mcp-primer">
+            <h3>MCP를 처음 보는 사람을 위한 설명</h3>
+            <p>
+              MCP(Model Context Protocol)는 AI/Agent가 외부 도구, 데이터, 업무 flow를 호출하기 위한 공통 연결 규칙입니다.
+              쉽게 말하면 Agent가 “웹 페이지 읽기”, “DB 조회”, “메일 초안 만들기”, “다른 Langflow flow 실행하기” 같은 일을 할 때
+              각 도구마다 제각각 연결 코드를 새로 짜지 않도록 맞춰 둔 표준 인터페이스입니다.
+            </p>
+            <div class="definition-grid">
+              <div class="definition-item"><b>MCP server</b><span>Agent가 사용할 tool을 제공하는 쪽입니다. 예: web fetch server, 사내 mail server, Langflow project MCP server.</span></div>
+              <div class="definition-item"><b>MCP client</b><span>MCP server에 연결해서 tool 목록을 가져오고 실행하는 쪽입니다. Langflow에서는 `MCP Tools` component가 이 역할을 합니다.</span></div>
+              <div class="definition-item"><b>MCP tool</b><span>Agent가 호출할 수 있는 하나의 기능입니다. 예: `fetch_url`, `create_email_draft`, `company_faq_answer`.</span></div>
+              <div class="definition-item"><b>Langflow에서의 의미</b><span>MCP는 flow logic을 대신 만드는 기능이 아니라, Agent와 외부 tool 또는 다른 flow 사이의 연결 경계를 표준화하는 기능입니다.</span></div>
+            </div>
+            <p class="muted-text">
+              교육에서는 먼저 Langflow를 MCP client로 써서 외부 tool을 Agent에 붙이고, 그 다음 Langflow flow를 MCP server로 공개해 다른 Agent가 재사용하는 순서로 이해하면 쉽습니다.
+            </p>
+            <div class="source-links">
+              <span>기준 링크</span>
+              <a href="https://modelcontextprotocol.io/docs/getting-started/intro" target="_blank" rel="noopener noreferrer">Model Context Protocol 소개</a>
+              <a href="https://docs.langflow.org/mcp-client" target="_blank" rel="noopener noreferrer">Langflow MCP client</a>
+              <a href="https://docs.langflow.org/mcp-server" target="_blank" rel="noopener noreferrer">Langflow MCP server</a>
+            </div>
+          </div>
+
+          <div class="grid-3">
+            <div class="card">
+              <h3>Langflow가 MCP client인 경우</h3>
+              <p>`MCP Tools` component로 외부 MCP server의 tool을 가져옵니다. 예: fetch, browser, DB, 사내 메일 발송 tool을 Agent의 `Tools` port에 연결합니다.</p>
+            </div>
+            <div class="card">
+              <h3>Langflow가 MCP server인 경우</h3>
+              <p>Project 안의 flow를 MCP tool로 노출합니다. 외부 MCP client는 해당 flow를 함수처럼 발견하고 호출합니다. flow에는 `Chat Output`이 있어야 합니다.</p>
+            </div>
+            <div class="card">
+              <h3>처음에는 tool 수를 작게</h3>
+              <p>여러 MCP server를 한 번에 붙이면 Agent가 tool을 잘못 고를 수 있습니다. 처음 실습은 fetch 1개, mail draft 1개처럼 작게 시작합니다.</p>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top:16px">
+            <h3>공식 문서 기준으로 보는 두 가지 사용법</h3>
+            <div class="table-wrap">
+              <table class="beginner-table">
+                <thead>
+                  <tr>
+                    <th>목표</th>
+                    <th>Langflow 화면에서 하는 일</th>
+                    <th>핵심 연결</th>
+                    <th>초보자가 확인할 것</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>외부 MCP tool 가져오기</td>
+                    <td>`Settings → MCP Servers` 또는 좌측 `MCP` sidebar에서 server를 등록하고, canvas에 `MCP Tools`를 추가합니다.</td>
+                    <td>`MCP Tools.Toolset` → `Agent.Tools`, `Chat Input` → `Agent`, `Agent` → `Chat Output`</td>
+                    <td>STDIO/JSON/HTTP-SSE 중 어떤 방식인지, `tool`을 하나만 고를지 전체 허용할지, env/header가 맞는지 확인합니다.</td>
+                  </tr>
+                  <tr>
+                    <td>Langflow flow를 MCP tool로 제공</td>
+                    <td>Project page의 `MCP Server` tab 또는 flow의 `Share → MCP Server`에서 노출할 flow를 선택합니다.</td>
+                    <td>외부 client가 project MCP endpoint를 MCP server로 등록합니다.</td>
+                    <td>flow에 `Chat Output`이 있는지, tool 이름/설명이 사람이 읽어도 명확한지 확인합니다.</td>
+                  </tr>
+                  <tr>
+                    <td>Langflow MCP endpoint를 다시 Langflow에서 쓰기</td>
+                    <td>Langflow project MCP URL을 `HTTP/SSE` server로 등록한 뒤 `MCP Tools` component를 canvas에 둡니다.</td>
+                    <td>다른 project의 flows-as-tools → 현재 flow의 `Agent.Tools`</td>
+                    <td>endpoint 예: `/api/v1/mcp/project/PROJECT_ID/streamable`, Desktop 기본 URL은 환경에 맞게 확인합니다.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="source-links">
+              <span>기준 링크</span>
+              <a href="https://docs.langflow.org/mcp-client" target="_blank" rel="noopener noreferrer">Use Langflow as an MCP client</a>
+              <a href="https://docs.langflow.org/mcp-server" target="_blank" rel="noopener noreferrer">Use Langflow as an MCP server</a>
+            </div>
+          </div>
+
+          <div class="pattern" data-pattern="mcp-web-digest-email">
+            <div class="panel">
+              <h3>예시 구현 Flow 1. 외부 MCP 가져와 사용하기</h3>
+              <p>
+                외부 MCP server에서 제공하는 `fetch`와 `create_draft` tool을 Langflow Agent에 붙이는 예시입니다.
+                사용자가 URL과 수신자를 입력하면 Agent가 페이지 내용을 가져오고, 요약 메일 초안을 만든 뒤, 실제 발송 전 `draft_only` 상태로 결과를 보여줍니다.
+                실습 데이터는 <a href="sample_files/mcp_web_digest_email_case.json">mcp_web_digest_email_case.json</a>에 정리했습니다.
+              </p>
+              <div class="source-links">
+                <span>관련 링크</span>
+                <a href="https://docs.langflow.org/mcp-client" target="_blank" rel="noopener noreferrer">Langflow MCP client</a>
+                <a href="sample_files/mcp_web_digest_email_case.json">실습 JSON</a>
+              </div>
+
+              <div class="connection-picture" aria-label="MCP web digest email flow connection picture">
+                <div class="connection-title">외부 MCP tool 사용 flow <span>외부 MCP tool 2개를 Agent의 Tools port에 붙이는 구조입니다.</span></div>
+                <div class="map-grid three">
+                  <div class="map-lane">
+                    <div class="map-lane-title">1. MCP server 등록</div>
+                    <div class="map-node io"><b>Settings / MCP Servers</b><span>외부 MCP server 등록</span><small>JSON, STDIO, HTTP/SSE</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node"><b>Web Fetch MCP</b><span>URL 본문을 읽는 tool</span><small>예: fetch</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node"><b>Company Mail MCP</b><span>메일 draft 또는 send tool</span><small>예: create_draft</small></div>
+                  </div>
+                  <div class="map-lane">
+                    <div class="map-lane-title">2. Langflow Agent flow</div>
+                    <div class="map-node io"><b>Chat Input</b><span>URL, 수신자, 요약 기준 입력</span><small>output: Message</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node hub"><b>Agent</b><span>fetch tool로 수집하고 mail draft tool로 초안 생성</span><small>Tools input 필요</small></div>
+                    <div class="map-arrow-down">↑ Toolset</div>
+                    <div class="map-node custom"><b>MCP Tools x 2</b><span>fetch server, mail server를 각각 연결</span><small>output: Toolset</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node io"><b>Chat Output</b><span>요약과 draft 결과 표시</span><small>input: Message</small></div>
+                  </div>
+                  <div class="map-lane">
+                    <div class="map-lane-title">3. Flow를 MCP로 제공</div>
+                    <div class="map-node"><b>Project MCP Server</b><span>이 flow를 외부 tool로 노출</span><small>Share → MCP Server</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node"><b>Edit Tools</b><span>tool 이름/설명 정리</span><small>예: web_digest_email_draft</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node io"><b>External MCP Client</b><span>Cursor, Windsurf, Claude 계열 client에서 호출</span><small>endpoint 등록</small></div>
+                  </div>
+                </div>
+                <div class="connection-lines">
+                  <div class="connection-line"><strong>1</strong><span><b>MCP server 등록</b>: Web fetch는 `uvx mcp-server-fetch` 같은 STDIO server로, 메일은 사내 HTTP/SSE MCP server 또는 사내 표준 mail MCP로 등록합니다.</span></div>
+                  <div class="connection-line"><strong>2</strong><span><b>MCP Tools.Toolset → Agent.Tools</b>: MCP Tools component header에서 Tool Mode를 켜고 Agent의 Tools port에 연결합니다.</span></div>
+                  <div class="connection-line"><strong>3</strong><span><b>Chat Input.Message → Agent.Input</b>: 사용자는 URL, 수신자, 요약 기준을 한 번에 입력합니다.</span></div>
+                  <div class="connection-line"><strong>4</strong><span><b>Agent.Message → Chat Output.input</b>: 최종 화면에는 “수집한 내용 요약”, “메일 제목/본문 초안”, “전송 여부”가 보이게 합니다.</span></div>
+                  <div class="connection-line"><strong>5</strong><span><b>Langflow flow → MCP tool</b>: 외부 client에 제공할 때는 `Chat Output`이 있는 flow만 선택하고 tool name/description을 업무명으로 바꿉니다.</span></div>
+                </div>
+              </div>
+
+              <div class="implementation-list">
+                <div class="implementation-row"><b>필요 노드</b><span>Chat Input, Agent, MCP Tools(Web Fetch), MCP Tools(Mail), Chat Output을 사용합니다. 메일 실제 전송 전에는 draft 생성 tool을 우선 사용합니다.</span></div>
+                <div class="implementation-row"><b>외부 조건</b><span>`npx` 기반 MCP server는 Node.js LTS가 필요할 수 있고, `uvx` 기반 server는 Langflow 환경에서 실행 가능해야 합니다. Docker라면 컨테이너 안에 필요한 runtime을 설치해야 합니다.</span></div>
+                <div class="implementation-row"><b>공개 조건</b><span>만든 flow를 MCP server로 제공하려면 `MCP Server` 화면에서 노출할 flow를 선택하고, 외부 client가 이해할 tool 이름과 설명을 지정합니다.</span></div>
+              </div>
+
+              <div class="beginner-guide">
+                <h4>초보자가 그대로 따라 하는 실습 순서</h4>
+                <ol class="beginner-steps">
+                  <li><strong>01</strong><span><b>Fetch server 등록</b>`MCP Servers`에서 STDIO server를 추가하고 command는 `uvx`, args는 `mcp-server-fetch`로 둡니다.</span></li>
+                  <li><strong>02</strong><span><b>Mail server 등록</b>교육용으로는 실제 발송보다 `create_draft` 또는 `preview_email` tool을 가진 사내 mail MCP server를 등록합니다.</span></li>
+                  <li><strong>03</strong><span><b>MCP Tools 두 개 추가</b>좌측 MCP sidebar에서 서버를 canvas로 끌어오고, 각 component의 `Tool` field에서 사용할 tool을 선택합니다.</span></li>
+                  <li><strong>04</strong><span><b>Agent에 tool 연결</b>두 `MCP Tools`의 `Toolset` output을 Agent의 `Tools` input에 연결합니다. Chat Input/Output도 Agent에 연결합니다.</span></li>
+                  <li><strong>05</strong><span><b>Playground에서 먼저 draft만 확인</b>아래 질문을 넣고 메일 본문 초안이 맞는지 봅니다. 실제 send tool은 승인 문구를 별도로 받은 뒤에만 사용합니다.</span></li>
+                </ol>
+
+                <div class="practice-box">
+                  <h4>실습 질문과 기대 결과</h4>
+                  <div class="practice-grid">
+                    <div class="practice-item"><b>넣을 질문</b><span>`https://docs.langflow.org/mcp-client` 페이지를 읽고 핵심만 5줄로 요약해서 training-review@example.com에게 보낼 메일 초안을 만들어줘. 아직 전송하지 말고 초안만 보여줘.</span></div>
+                    <div class="practice-item"><b>기대 결과</b><span>페이지 요약, 메일 제목, 본문 초안, 사용한 URL, 전송 상태 `draft_only`가 표시됩니다.</span></div>
+                    <div class="practice-item"><b>실패 테스트</b><span>URL이 비어 있거나 mail server가 없으면 Agent가 “수집/메일 tool이 준비되지 않았다”고 설명해야 합니다.</span></div>
+                    <div class="practice-item"><b>제공 테스트</b><span>이 flow를 MCP tool로 공개한 뒤 외부 client에서 같은 질문을 호출해 동일한 초안이 나오는지 확인합니다.</span></div>
+                  </div>
+                </div>
+
+                <div class="code-card" data-code-collapsible>
+                  <div class="code-head">
+                    <strong>MCP server 등록 예시</strong>
+                    <button class="copy-button"><i data-lucide="copy"></i>복사</button>
+                  </div>
+                  <pre><code>{
+  "mcpServers": {
+    "web_fetch": {
+      "command": "uvx",
+      "args": ["mcp-server-fetch"]
+    },
+    "company_mailer": {
+      "url": "https://mcp.company.example/streamable",
+      "headers": {
+        "Authorization": "Bearer ${COMPANY_MAIL_MCP_TOKEN}"
+      }
+    }
+  }
+}</code></pre>
+                </div>
+
+                <div class="code-card" data-code-collapsible>
+                  <div class="code-head">
+                    <strong>Agent instruction 예시</strong>
+                    <button class="copy-button"><i data-lucide="copy"></i>복사</button>
+                  </div>
+                  <pre><code>역할:
+너는 웹 페이지를 읽고 업무용 메일 초안을 작성하는 assistant다.
+
+절차:
+1. 사용자 입력에서 URL, 수신자, 요약 기준을 확인한다.
+2. URL이 있으면 fetch tool로 페이지 내용을 가져온다.
+3. 내용이 길면 핵심 주장, 수치, action item 중심으로 5줄 이내로 요약한다.
+4. 메일 제목과 본문 초안을 만든다.
+5. 실제 전송은 사용자가 "전송 승인"이라고 말하기 전에는 하지 않는다.
+6. 교육 실습에서는 mail tool의 create_draft 또는 preview_email만 사용한다.
+
+출력 형식:
+- 수집 URL
+- 요약
+- 메일 제목
+- 메일 본문
+- 전송 상태: draft_only / sent / blocked
+- 오류가 있으면 errors 배열에 적는다.</code></pre>
+                </div>
+
+                <div class="code-card" data-code-collapsible>
+                  <div class="code-head">
+                    <strong>Langflow flow를 MCP tool로 공개할 때 endpoint 메모</strong>
+                    <button class="copy-button"><i data-lucide="copy"></i>복사</button>
+                  </div>
+                  <pre><code># Project-specific MCP server
+http://localhost:7860/api/v1/mcp/project/PROJECT_ID/streamable
+
+# Global MCP server
+http://localhost:7860/api/v1/mcp/streamable
+
+# Langflow Desktop은 환경에 따라 기본 URL이 다를 수 있습니다.
+# 공식 문서 예시는 다음 값을 함께 안내합니다.
+http://localhost:7868/</code></pre>
+                </div>
+
+                <div class="table-wrap">
+                  <table class="beginner-table">
+                    <thead>
+                      <tr>
+                        <th>목표</th>
+                        <th>From 노드 / output</th>
+                        <th>Output 타입</th>
+                        <th>To 노드 / input</th>
+                        <th>Input 타입</th>
+                        <th>연결 기준</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>사용자 요청 전달</td>
+                        <td>`Chat Input` / `Message`</td>
+                        <td>`Message`</td>
+                        <td>`Agent` / `Input`</td>
+                        <td>`Message`</td>
+                        <td>가능. URL, 수신자, 요약 기준을 자연어로 받습니다.</td>
+                      </tr>
+                      <tr>
+                        <td>웹 수집 tool 연결</td>
+                        <td>`MCP Tools(Web Fetch)` / `Toolset`</td>
+                        <td>`Toolset`</td>
+                        <td>`Agent` / `Tools`</td>
+                        <td>`Tools`</td>
+                        <td>가능. tool을 하나로 제한하면 Agent 선택 실수가 줄어듭니다.</td>
+                      </tr>
+                      <tr>
+                        <td>메일 draft tool 연결</td>
+                        <td>`MCP Tools(Mail)` / `Toolset`</td>
+                        <td>`Toolset`</td>
+                        <td>`Agent` / `Tools`</td>
+                        <td>`Tools`</td>
+                        <td>가능. 교육 단계에서는 `send_email`보다 `create_draft`를 우선합니다.</td>
+                      </tr>
+                      <tr>
+                        <td>최종 결과 표시</td>
+                        <td>`Agent` / `Message`</td>
+                        <td>`Message`</td>
+                        <td>`Chat Output` / input</td>
+                        <td>`Message`, `JSON`, `Table` 허용</td>
+                        <td>가능. draft id, 제목, 본문, 전송 상태를 보여줍니다.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pattern" data-pattern="mcp-langflow-flow-as-tool">
+            <div class="panel">
+              <h3>예시 구현 Flow 2. Langflow로 만든 Flow를 MCP로 제공하고 다른 Flow에서 사용하기</h3>
+              <p>
+                먼저 `사내 FAQ 답변 flow`를 하나 만들고 MCP tool로 공개합니다. 그 다음 다른 Langflow project에서 이 project MCP endpoint를
+                `HTTP/SSE` MCP server로 등록해 `MCP Tools` component로 가져옵니다. 이렇게 하면 공통 RAG/FAQ flow를 여러 업무 Agent가 재사용할 수 있습니다.
+                실습 데이터는 <a href="sample_files/mcp_langflow_flow_as_tool_case.json">mcp_langflow_flow_as_tool_case.json</a>에 정리했습니다.
+              </p>
+              <div class="source-links">
+                <span>관련 링크</span>
+                <a href="https://docs.langflow.org/mcp-server" target="_blank" rel="noopener noreferrer">Langflow MCP server</a>
+                <a href="https://docs.langflow.org/mcp-client" target="_blank" rel="noopener noreferrer">Langflow MCP client</a>
+                <a href="sample_files/mcp_langflow_flow_as_tool_case.json">실습 JSON</a>
+              </div>
+
+              <div class="connection-picture" aria-label="Langflow flow exposed as MCP tool and reused by another flow">
+                <div class="connection-title">Langflow flow-as-tool 재사용 그림 <span>Producer flow를 MCP로 공개하고 Consumer flow가 tool로 호출합니다.</span></div>
+                <div class="map-grid three">
+                  <div class="map-lane">
+                    <div class="map-lane-title">A. Producer Flow 만들기</div>
+                    <div class="map-node io"><b>Chat Input</b><span>사내 FAQ 질문</span><small>output: Message</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node custom"><b>File Dataset Loader / Retriever</b><span>company_faq_rag.json 또는 Milvus 검색</span><small>output: Data</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node"><b>Prompt Template + Language Model</b><span>근거 기반 답변 생성</span><small>output: Message</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node io"><b>Chat Output</b><span>MCP tool 반환값</span><small>required for MCP tool</small></div>
+                  </div>
+                  <div class="map-lane">
+                    <div class="map-lane-title">B. MCP Server로 공개</div>
+                    <div class="map-node"><b>Project MCP Server tab</b><span>Producer project 열기</span><small>Projects → MCP Server</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node"><b>Edit Tools</b><span>flow 선택, tool 이름/설명 수정</span><small>company_faq_answer</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node"><b>Project MCP Endpoint</b><span>project-specific streamable URL 복사</span><small>/api/v1/mcp/project/.../streamable</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node"><b>Auth 설정</b><span>필요 시 API key/OAuth 설정</span><small>x-api-key</small></div>
+                  </div>
+                  <div class="map-lane">
+                    <div class="map-lane-title">C. Consumer Flow에서 사용</div>
+                    <div class="map-node io"><b>Chat Input</b><span>업무 Agent 질문</span><small>output: Message</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node custom"><b>MCP Tools(Langflow Project)</b><span>Producer flow를 tool로 가져옴</span><small>output: Toolset</small></div>
+                    <div class="map-arrow-down">↓ Toolset</div>
+                    <div class="map-node hub"><b>Agent</b><span>필요할 때 company_faq_answer tool 호출</span><small>Tools input</small></div>
+                    <div class="map-arrow-down">↓</div>
+                    <div class="map-node io"><b>Chat Output</b><span>tool 결과를 포함한 최종 답변</span><small>input: Message</small></div>
+                  </div>
+                </div>
+                <div class="connection-lines">
+                  <div class="connection-line"><strong>1</strong><span><b>Producer Flow에는 Chat Output 필수</b>: 공식 문서 기준 flow를 MCP tool로 쓰려면 `Chat Output`이 있어야 합니다.</span></div>
+                  <div class="connection-line"><strong>2</strong><span><b>Tool name/description 수정</b>: 기본 flow ID 대신 `company_faq_answer`처럼 용도를 드러내는 이름을 씁니다.</span></div>
+                  <div class="connection-line"><strong>3</strong><span><b>Consumer에서 HTTP/SSE MCP server 등록</b>: Producer project endpoint를 `Settings → MCP Servers`에 등록합니다.</span></div>
+                  <div class="connection-line"><strong>4</strong><span><b>MCP Tools.Toolset → Agent.Tools</b>: Consumer Agent가 Producer flow를 tool처럼 호출할 수 있게 연결합니다.</span></div>
+                  <div class="connection-line"><strong>5</strong><span><b>검증</b>: Producer flow 단독 Playground 결과와 Consumer Agent가 tool 호출 후 답한 결과가 같은 근거를 포함해야 합니다.</span></div>
+                </div>
+              </div>
+
+              <div class="implementation-list">
+                <div class="implementation-row"><b>Producer flow</b><span>공통으로 재사용할 `사내 FAQ 답변`, `문서 RAG`, `데이터 조회` 같은 flow입니다. 입력은 Chat Input 하나로 단순하게 시작하고, 출력은 Chat Output으로 닫습니다.</span></div>
+                <div class="implementation-row"><b>MCP 공개 설정</b><span>Project의 MCP Server 화면에서 flow를 선택하고 tool name/description을 수정합니다. 여러 flow를 한꺼번에 노출하기보다 교육 단계에서는 하나만 켭니다.</span></div>
+                <div class="implementation-row"><b>Consumer flow</b><span>다른 업무 Agent flow에서 Producer project MCP endpoint를 등록하고 `MCP Tools`를 Agent의 Tools input에 연결합니다.</span></div>
+              </div>
+
+              <div class="beginner-guide">
+                <h4>초보자가 그대로 따라 하는 실습 순서</h4>
+                <ol class="beginner-steps">
+                  <li><strong>01</strong><span><b>Producer flow 생성</b>`Chat Input → File Dataset Loader(company_faq_rag.json) 또는 Retriever → Prompt Template → Language Model → Chat Output`으로 사내 FAQ 답변 flow를 만듭니다.</span></li>
+                  <li><strong>02</strong><span><b>Producer 단독 테스트</b>Playground에서 `Route Gate는 선택되지 않은 branch를 어떻게 처리해?` 같은 질문을 넣어 답변을 확인합니다.</span></li>
+                  <li><strong>03</strong><span><b>MCP Server로 공개</b>Project의 `MCP Server` tab 또는 `Share → MCP Server`에서 `Edit Tools`를 열고 해당 flow만 선택합니다.</span></li>
+                  <li><strong>04</strong><span><b>tool 이름/설명 작성</b>tool name은 `company_faq_answer`, description은 “사내 Langflow 교육 FAQ를 근거로 질문에 답한다”처럼 씁니다.</span></li>
+                  <li><strong>05</strong><span><b>Consumer flow에서 등록</b>다른 project에서 `HTTP/SSE` MCP server로 Producer endpoint를 등록하고, MCP Tools component를 Agent에 연결합니다.</span></li>
+                  <li><strong>06</strong><span><b>Consumer에서 호출 테스트</b>사용자 질문에 대해 Agent가 `company_faq_answer` tool을 호출하고 결과를 Chat Output에 보여주는지 확인합니다.</span></li>
+                </ol>
+
+                <div class="practice-box">
+                  <h4>실습 질문과 기대 결과</h4>
+                  <div class="practice-grid">
+                    <div class="practice-item"><b>Producer 질문</b><span>`Route Gate에서 선택되지 않은 branch는 어떻게 처리해야 해?`</span></div>
+                    <div class="practice-item"><b>Producer 기대 결과</b><span>`success=false`, `active=false`, `skipped=true`와 downstream guard를 포함한 답변이 나옵니다.</span></div>
+                    <div class="practice-item"><b>Consumer 질문</b><span>`사내 Langflow 교육 FAQ tool을 사용해서 Route Gate branch 처리 기준을 알려줘.`</span></div>
+                    <div class="practice-item"><b>Consumer 기대 결과</b><span>Agent가 MCP tool `company_faq_answer`를 호출하고 Producer와 같은 근거를 포함해 답합니다.</span></div>
+                  </div>
+                </div>
+
+                <div class="code-card" data-code-collapsible>
+                  <div class="code-head">
+                    <strong>Producer MCP tool 이름/설명 예시</strong>
+                    <button class="copy-button"><i data-lucide="copy"></i>복사</button>
+                  </div>
+                  <pre><code>Tool name:
+company_faq_answer
+
+Tool description:
+Answer questions about the internal Langflow study material using the company FAQ/RAG flow.
+Use this tool when the user asks about custom components, Route Gate branching,
+MCP integration, Milvus RAG, or training sample files.
+Return a concise Korean answer with the source topic when possible.</code></pre>
+                </div>
+
+                <div class="code-card" data-code-collapsible>
+                  <div class="code-head">
+                    <strong>Consumer flow의 Langflow MCP server 등록 예시</strong>
+                    <button class="copy-button"><i data-lucide="copy"></i>복사</button>
+                  </div>
+                  <pre><code>{
+  "mcpServers": {
+    "langflow_study_tools": {
+      "url": "http://localhost:7860/api/v1/mcp/project/PROJECT_ID/streamable",
+      "headers": {
+        "x-api-key": "${LANGFLOW_PROJECT_MCP_API_KEY}"
+      }
+    }
+  }
+}</code></pre>
+                </div>
+
+                <div class="table-wrap">
+                  <table class="beginner-table">
+                    <thead>
+                      <tr>
+                        <th>목표</th>
+                        <th>From 노드 / output</th>
+                        <th>Output 타입</th>
+                        <th>To 노드 / input</th>
+                        <th>Input 타입</th>
+                        <th>연결 기준</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Producer 답변 생성</td>
+                        <td>`Language Model` / `Model Response`</td>
+                        <td>`Message`</td>
+                        <td>`Chat Output` / input</td>
+                        <td>`Message`</td>
+                        <td>필수. MCP tool로 공개할 flow는 Chat Output으로 닫습니다.</td>
+                      </tr>
+                      <tr>
+                        <td>Producer를 tool로 가져오기</td>
+                        <td>`MCP Tools(Langflow Project)` / `Toolset`</td>
+                        <td>`Toolset`</td>
+                        <td>`Agent` / `Tools`</td>
+                        <td>`Tools`</td>
+                        <td>가능. `Tool` field에서 `company_faq_answer`를 선택하면 선택 실수가 줄어듭니다.</td>
+                      </tr>
+                      <tr>
+                        <td>Consumer 질문 전달</td>
+                        <td>`Chat Input` / `Message`</td>
+                        <td>`Message`</td>
+                        <td>`Agent` / `Input`</td>
+                        <td>`Message`</td>
+                        <td>가능. Agent instruction에 “FAQ 질문이면 company_faq_answer tool 사용” 기준을 적습니다.</td>
+                      </tr>
+                      <tr>
+                        <td>최종 표시</td>
+                        <td>`Agent` / `Message`</td>
+                        <td>`Message`</td>
+                        <td>`Chat Output` / input</td>
+                        <td>`Message`, `JSON`, `Table` 허용</td>
+                        <td>가능. tool이 반환한 답변과 Agent의 보충 설명을 함께 보여줍니다.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="validation" data-search-block>
           <div class="section-head">
             <div>
-              <h2>5. 검증 체크리스트</h2>
+              <h2>7. 검증 체크리스트</h2>
               <p>체크 상태는 이 브라우저의 localStorage에 저장됩니다. 교육 중 실습 완료 확인용으로 사용할 수 있습니다.</p>
             </div>
             <span class="tag">QA</span>
@@ -5395,6 +6132,9 @@ done_payload = {"success": True, "items": results, "row_count": len(results)}</c
                 <label class="check-item"><input type="checkbox" data-check="flow-playground"><span>Playground에서 대표 질문과 실패 질문을 모두 실행했다.</span></label>
                 <label class="check-item"><input type="checkbox" data-check="flow-api"><span>API access 또는 embed 방식으로 외부 호출을 확인했다.</span></label>
                 <label class="check-item"><input type="checkbox" data-check="flow-tools"><span>Agent tool action 설명과 활성화 여부를 검토했다.</span></label>
+                <label class="check-item"><input type="checkbox" data-check="flow-mcp-tools"><span>MCP Tools의 Toolset output이 Agent Tools input에 연결되어 있다.</span></label>
+                <label class="check-item"><input type="checkbox" data-check="flow-mcp-publish"><span>MCP로 공개할 flow에는 Chat Output이 있고 tool 이름/설명이 명확하다.</span></label>
+                <label class="check-item"><input type="checkbox" data-check="flow-mcp-side-effect"><span>메일 발송 같은 side effect tool은 draft/approval/send 단계를 분리했다.</span></label>
                 <label class="check-item"><input type="checkbox" data-check="flow-regression"><span>업무별 regression 질문 세트를 최소 10개 확보했다.</span></label>
                 <label class="check-item"><input type="checkbox" data-check="flow-observability"><span>오류, empty result, 권한 실패, timeout이 사용자에게 구분되어 보인다.</span></label>
               </div>
@@ -5429,37 +6169,41 @@ langflow run --port 7860
             <span class="tag">Sources</span>
           </div>
           <ul class="source-list">
-            <li><a href="https://docs.langflow.org/components-custom-components">Create custom Python components</a> - custom component 구조, class metadata, inputs/outputs, 로드 방식</li>
-            <li><a href="https://docs.langflow.org/concepts-components">Components overview</a> - 기본 노드 추가 방식, component grouping, output type 선택 개념</li>
-            <li><a href="https://docs.langflow.org/data-types">Langflow data types</a> - port/data type 연결 원칙</li>
-            <li><a href="https://docs.langflow.org/chat-input-and-output">Chat Input and Output</a> - Chat Input `Message` 생성, Chat Output의 `Message/JSON/Table` 입력</li>
-            <li><a href="https://docs.langflow.org/components-prompts">Prompt Template</a> - `{variable}` 기반 prompt 변수 input 생성과 연결 방식</li>
-            <li><a href="https://docs.langflow.org/components-models">Language Model</a> - `Model Response`와 `LanguageModel` output 차이</li>
-            <li><a href="https://docs.langflow.org/structured-output">Structured Output</a> - LLM으로 `JSON/Table` 구조화 결과를 만드는 방식</li>
-            <li><a href="https://docs.langflow.org/type-convert">Type Convert</a> - `JSON`, `Table`, `Message` 타입 변환 기준</li>
-            <li><a href="https://docs.langflow.org/data-operations">JSON Operations</a> - JSON key 선택, 필터링, 변환과 Type Convert 사용 기준</li>
-            <li><a href="https://docs.langflow.org/split-text">Split Text</a> - RAG 적재용 chunk 생성 기준</li>
-            <li><a href="https://docs.langflow.org/components-embedding-models">Embedding Model</a> - embedding 모델과 chunk size, vector store 호환 기준</li>
-            <li><a href="https://docs.langflow.org/agents-tools">Configure tools for agents</a> - Tool Mode, custom component tool, Run Flow tool</li>
-            <li><a href="https://docs.langflow.org/run-flow">Run Flow</a> - 하위 flow 실행, 동적 input/output field, Agent tool 연결 기준</li>
-            <li><a href="https://docs.langflow.org/concepts-flows">Build flows</a> - flow의 기본 개념과 template 기반 시작점</li>
-            <li><a href="https://docs.langflow.org/read-file">Read File</a> - 파일 업로드와 기본 파일 읽기 노드 사용법</li>
-            <li><a href="https://docs.langflow.org/chat-with-rag">Create a vector RAG chatbot</a> - Load Data Flow / Retriever Flow 분리와 RAG 화면 이미지 출처</li>
-            <li><a href="https://docs.langflow.org/bundles-docling">Docling bundle</a> - 문서 파싱, chunking, vector store 적재 화면 이미지 출처</li>
-            <li><a href="https://docs.langflow.org/bundles-milvus">Milvus bundle</a> - Milvus vector store, `ingest_data`, `embedding`, `collection_name`, `uri`, search 설정</li>
-            <li><a href="https://docs.langflow.org/loop">Loop component</a> - list JSON/Table 반복 처리, Item/Looping/Done port, 조건부 반복 설계</li>
-            <li><a href="https://milvus.io/blog/drag-drop-and-deploy-how-to-build-rag-workflows-with-langflow-and-milvus.md">Milvus + Langflow RAG tutorial</a> - Vector Store RAG template에서 Milvus를 연결하고 적재/검색을 테스트하는 화면 이미지 출처</li>
-            <li><a href="https://milvus.io/docs/rag_with_langflow.md">Building a RAG System Using Langflow with Milvus</a> - Milvus 공식 Langflow RAG 튜토리얼과 설정 절차</li>
-            <li><a href="https://docs.langflow.org/get-started-quickstart">Langflow Quickstart</a> - Simple Agent template와 Playground 이미지 출처</li>
-            <li><a href="https://docs.langflow.org/parser">Parser</a> - Structured Output과 Parser 연결 이미지 출처</li>
-            <li><a href="https://www.langflow.org/use-cases">Langflow Use Cases</a> - ready-made agents, RAG templates, business automation template 방향</li>
-            <li><a href="https://github.com/Empreiteiro/langflow-templates">Empreiteiro/langflow-templates</a> - 커뮤니티 template 카테고리 조사 참고</li>
-            <li><a href="https://github.com/Empreiteiro/langflow-factory">Empreiteiro/langflow-factory</a> - 커뮤니티 custom component library 조사 참고</li>
-            <li><a href="https://www.langflow.org/blog/robust-enterprise-ai-agent-workflow-langflow-cuga">Enterprise AI Agent workflow with CUGA</a> - multi-step enterprise flow와 이미지 출처</li>
-            <li><a href="https://github.com/langflow-ai/langflow/blob/main/docs/docs/Contributing/contributing-templates.mdx">Contributing templates</a> - template 이름, 설명, screenshot, Note/README 요구사항 참고</li>
-            <li><a href="https://docs.langflow.org/concepts-publish">Trigger flows with the Langflow API</a> - API access, tweaks, embed chat widget</li>
-            <li><a href="https://docs.langflow.org/concepts-playground">Test flows in the Playground</a> - Playground 기반 flow 테스트</li>
-            <li><a href="https://docs.langflow.org/environment-variables">Environment variables</a> - `LANGFLOW_COMPONENTS_PATH`, custom component 로드 관련 설정</li>
+            <li><a href="https://docs.langflow.org/components-custom-components" target="_blank" rel="noopener noreferrer">Create custom Python components</a> - custom component 구조, class metadata, inputs/outputs, 로드 방식</li>
+            <li><a href="https://docs.langflow.org/concepts-components" target="_blank" rel="noopener noreferrer">Components overview</a> - 기본 노드 추가 방식, component grouping, output type 선택 개념</li>
+            <li><a href="https://docs.langflow.org/data-types" target="_blank" rel="noopener noreferrer">Langflow data types</a> - port/data type 연결 원칙</li>
+            <li><a href="https://docs.langflow.org/chat-input-and-output" target="_blank" rel="noopener noreferrer">Chat Input and Output</a> - Chat Input `Message` 생성, Chat Output의 `Message/JSON/Table` 입력</li>
+            <li><a href="https://docs.langflow.org/components-prompts" target="_blank" rel="noopener noreferrer">Prompt Template</a> - `{variable}` 기반 prompt 변수 input 생성과 연결 방식</li>
+            <li><a href="https://docs.langflow.org/components-models" target="_blank" rel="noopener noreferrer">Language Model</a> - `Model Response`와 `LanguageModel` output 차이</li>
+            <li><a href="https://docs.langflow.org/structured-output" target="_blank" rel="noopener noreferrer">Structured Output</a> - LLM으로 `JSON/Table` 구조화 결과를 만드는 방식</li>
+            <li><a href="https://docs.langflow.org/type-convert" target="_blank" rel="noopener noreferrer">Type Convert</a> - `JSON`, `Table`, `Message` 타입 변환 기준</li>
+            <li><a href="https://docs.langflow.org/data-operations" target="_blank" rel="noopener noreferrer">JSON Operations</a> - JSON key 선택, 필터링, 변환과 Type Convert 사용 기준</li>
+            <li><a href="https://docs.langflow.org/split-text" target="_blank" rel="noopener noreferrer">Split Text</a> - RAG 적재용 chunk 생성 기준</li>
+            <li><a href="https://docs.langflow.org/components-embedding-models" target="_blank" rel="noopener noreferrer">Embedding Model</a> - embedding 모델과 chunk size, vector store 호환 기준</li>
+            <li><a href="https://docs.langflow.org/agents-tools" target="_blank" rel="noopener noreferrer">Configure tools for agents</a> - Tool Mode, custom component tool, Run Flow tool</li>
+            <li><a href="https://docs.langflow.org/mcp-client" target="_blank" rel="noopener noreferrer">Use Langflow as an MCP client</a> - MCP server 등록, `MCP Tools.Toolset -> Agent.Tools` 연결, STDIO/JSON/HTTP-SSE 방식</li>
+            <li><a href="https://docs.langflow.org/mcp-server" target="_blank" rel="noopener noreferrer">Use Langflow as an MCP server</a> - project/flow를 MCP tool로 노출, `Chat Output` 필요 조건, tool 이름/설명 관리</li>
+            <li><a href="https://docs.langflow.org/langflow-mcp-client" target="_blank" rel="noopener noreferrer">Langflow MCP Client for coding agents</a> - Claude Code, Bob 같은 coding agent에서 Langflow를 MCP로 연결하는 방식</li>
+            <li><a href="https://docs.langflow.org/mcp-component-astra" target="_blank" rel="noopener noreferrer">Connect an Astra DB MCP server to Langflow</a> - `npx` 기반 MCP server 등록과 Agent tool 연결 사례</li>
+            <li><a href="https://docs.langflow.org/run-flow" target="_blank" rel="noopener noreferrer">Run Flow</a> - 하위 flow 실행, 동적 input/output field, Agent tool 연결 기준</li>
+            <li><a href="https://docs.langflow.org/concepts-flows" target="_blank" rel="noopener noreferrer">Build flows</a> - flow의 기본 개념과 template 기반 시작점</li>
+            <li><a href="https://docs.langflow.org/read-file" target="_blank" rel="noopener noreferrer">Read File</a> - 파일 업로드와 기본 파일 읽기 노드 사용법</li>
+            <li><a href="https://docs.langflow.org/chat-with-rag" target="_blank" rel="noopener noreferrer">Create a vector RAG chatbot</a> - Load Data Flow / Retriever Flow 분리와 RAG 화면 이미지 출처</li>
+            <li><a href="https://docs.langflow.org/bundles-docling" target="_blank" rel="noopener noreferrer">Docling bundle</a> - 문서 파싱, chunking, vector store 적재 화면 이미지 출처</li>
+            <li><a href="https://docs.langflow.org/bundles-milvus" target="_blank" rel="noopener noreferrer">Milvus bundle</a> - Milvus vector store, `ingest_data`, `embedding`, `collection_name`, `uri`, search 설정</li>
+            <li><a href="https://docs.langflow.org/loop" target="_blank" rel="noopener noreferrer">Loop component</a> - list JSON/Table 반복 처리, Item/Looping/Done port, 조건부 반복 설계</li>
+            <li><a href="https://milvus.io/blog/drag-drop-and-deploy-how-to-build-rag-workflows-with-langflow-and-milvus.md" target="_blank" rel="noopener noreferrer">Milvus + Langflow RAG tutorial</a> - Vector Store RAG template에서 Milvus를 연결하고 적재/검색을 테스트하는 화면 이미지 출처</li>
+            <li><a href="https://milvus.io/docs/rag_with_langflow.md" target="_blank" rel="noopener noreferrer">Building a RAG System Using Langflow with Milvus</a> - Milvus 공식 Langflow RAG 튜토리얼과 설정 절차</li>
+            <li><a href="https://docs.langflow.org/get-started-quickstart" target="_blank" rel="noopener noreferrer">Langflow Quickstart</a> - Simple Agent template와 Playground 이미지 출처</li>
+            <li><a href="https://docs.langflow.org/parser" target="_blank" rel="noopener noreferrer">Parser</a> - Structured Output과 Parser 연결 이미지 출처</li>
+            <li><a href="https://www.langflow.org/use-cases" target="_blank" rel="noopener noreferrer">Langflow Use Cases</a> - ready-made agents, RAG templates, business automation template 방향</li>
+            <li><a href="https://github.com/Empreiteiro/langflow-templates" target="_blank" rel="noopener noreferrer">Empreiteiro/langflow-templates</a> - 커뮤니티 template 카테고리 조사 참고</li>
+            <li><a href="https://github.com/Empreiteiro/langflow-factory" target="_blank" rel="noopener noreferrer">Empreiteiro/langflow-factory</a> - 커뮤니티 custom component library 조사 참고</li>
+            <li><a href="https://www.langflow.org/blog/robust-enterprise-ai-agent-workflow-langflow-cuga" target="_blank" rel="noopener noreferrer">Enterprise AI Agent workflow with CUGA</a> - multi-step enterprise flow와 이미지 출처</li>
+            <li><a href="https://github.com/langflow-ai/langflow/blob/main/docs/docs/Contributing/contributing-templates.mdx" target="_blank" rel="noopener noreferrer">Contributing templates</a> - template 이름, 설명, screenshot, Note/README 요구사항 참고</li>
+            <li><a href="https://docs.langflow.org/concepts-publish" target="_blank" rel="noopener noreferrer">Trigger flows with the Langflow API</a> - API access, tweaks, embed chat widget</li>
+            <li><a href="https://docs.langflow.org/concepts-playground" target="_blank" rel="noopener noreferrer">Test flows in the Playground</a> - Playground 기반 flow 테스트</li>
+            <li><a href="https://docs.langflow.org/environment-variables" target="_blank" rel="noopener noreferrer">Environment variables</a> - `LANGFLOW_COMPONENTS_PATH`, custom component 로드 관련 설정</li>
           </ul>
         </section>
       </div>

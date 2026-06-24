@@ -74,6 +74,36 @@ Route Gate에서 선택되지 않은 branch는 어떻게 처리해야 해?
 
 선택되지 않은 branch는 `success=false`, `active=false`, `skipped=true`로 반환하고, downstream은 `active=true`이며 `skipped=false`인 branch만 처리해야 합니다.
 
+질문:
+
+```text
+route 값이 data_retrieval, document_rag, final_answer일 때 각각 어떤 흐름으로 가야 해?
+```
+
+기대 답변:
+
+`data_retrieval`은 API/DB/CSV 같은 정형 데이터 조회 branch로 보내고, `document_rag`는 Milvus 또는 Vector Store 기반 문서 검색 branch로 보냅니다. `final_answer`는 추가 조회 없이 final prompt 또는 질문 보정 답변 branch로 보냅니다. 처음 실습에서는 세 output을 각각 Chat Output에 연결해 `active=true`와 `skipped=true` payload를 먼저 확인합니다.
+
+질문:
+
+```text
+MCP로 웹 페이지를 읽고 메일 초안을 만드는 flow는 어떻게 연결해?
+```
+
+기대 답변:
+
+외부 web fetch MCP server와 mail MCP server를 `Settings > MCP Servers` 또는 MCP sidebar에서 등록한 뒤, 각각 `MCP Tools` component로 canvas에 추가합니다. 두 `MCP Tools`의 `Toolset` output을 Agent의 `Tools` input에 연결하고, `Chat Input`은 Agent input에, Agent output은 `Chat Output`에 연결합니다. 교육 단계에서는 실제 발송보다 `create_draft` 또는 `preview_email` tool을 사용하고, 사용자가 승인하기 전에는 `send_email`을 호출하지 않습니다. 만든 flow를 외부 client가 쓰게 하려면 Project의 `MCP Server` 화면에서 해당 flow를 tool로 노출하고 이름/설명을 명확히 수정합니다.
+
+질문:
+
+```text
+Langflow에서 만든 사내 FAQ flow를 MCP tool로 공개하고 다른 flow에서 쓰려면 어떻게 해?
+```
+
+기대 답변:
+
+먼저 Producer flow를 `Chat Input -> Retriever/File Dataset Loader -> Prompt Template -> Language Model -> Chat Output`처럼 만들고 단독 Playground에서 답변을 확인합니다. flow를 MCP tool로 공개하려면 `Chat Output`이 필요합니다. 그 다음 Project의 `MCP Server` tab 또는 `Share -> MCP Server`에서 `Edit Tools`를 열고 해당 flow만 선택한 뒤 tool name을 `company_faq_answer`처럼 명확히 바꿉니다. Consumer flow에서는 Producer project MCP endpoint를 `HTTP/SSE` MCP server로 등록하고, `MCP Tools.Toolset`을 Agent의 `Tools` input에 연결합니다. 이후 사용자 질문이 FAQ/RAG 성격이면 Agent가 `company_faq_answer` tool을 호출해 답변합니다.
+
 ## CSV 분석
 
 파일: `quality_inspection_metrics.csv`

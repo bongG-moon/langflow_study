@@ -19,6 +19,8 @@
 - `3페이지 defect_rate 차트에서 가장 위험한 lot과 원인은 뭐야?`
 - `File Dataset Loader는 Read File 대신 언제 쓰는 컴포넌트야?`
 - `Milvus 적재 payload에는 어떤 필드가 들어가야 해?`
+- `MCP로 웹 페이지를 읽고 메일 초안을 만드는 flow는 어떻게 연결해?`
+- `Langflow에서 만든 사내 FAQ flow를 MCP tool로 공개하고 다른 flow에서 쓰려면 어떻게 해?`
 
 ## 파일별 용도
 
@@ -33,6 +35,8 @@
 | `sample_markdown_policy.md` | Markdown 정책 문서 Q&A | `File Dataset Loader(parse_mode=markdown)` |
 | `milvus_document_payload.json` | Milvus chunk builder 직접 연결 | `Multimodal Milvus Chunk Builder.document_payload` |
 | `run_flow_payload_sample.json` | Run Flow payload bridge 실습 | `Run Flow Payload Adapter.payload` |
+| `mcp_web_digest_email_case.json` | MCP fetch + mail draft 활용 사례 실습 | `MCP Tools`, `Agent`, `Chat Output` |
+| `mcp_langflow_flow_as_tool_case.json` | Langflow flow를 MCP tool로 공개하고 다른 flow에서 재사용하는 실습 | `MCP Server`, `MCP Tools`, `Agent` |
 | `rag_eval_cases.json` | 자동/수동 검증용 질문-기대답변 | 평가 또는 교육 진행표 |
 | `sample_questions_and_expected_answers.md` | 복사해서 넣을 질문과 기대 답변 | 교육 진행표 |
 
@@ -44,4 +48,5 @@
 - 숫자 질문은 주요 수치와 대상 lot/line을 포함한다.
 - RAG 질문은 lifecycle, component, Milvus field 같은 핵심 키워드를 포함한다.
 - 이미지 PDF 질문은 2페이지 공정 흐름도와 3페이지 차트의 핵심 수치/병목을 포함한다.
+- MCP 질문은 외부 MCP server 등록, `MCP Tools.Toolset -> Agent.Tools` 연결, flow를 MCP server로 제공하는 방향을 구분한다.
 - 모르는 내용은 파일에 없다고 말하고 임의로 꾸며내지 않는다.

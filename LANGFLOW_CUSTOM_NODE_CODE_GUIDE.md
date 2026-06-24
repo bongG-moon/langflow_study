@@ -283,9 +283,9 @@ class InputOutputContractExample(Component):
 | `advanced` | Input | 고급 영역 표시 | debug, timeout, limit, threshold에 사용 |
 | `input_types` | `DataInput`, `DataFrameInput` 등 | 받을 수 있는 port 타입 제한 | `["Data", "JSON"]`처럼 명시 |
 | `options` | `DropdownInput` | 선택지 목록 | mode, provider, route처럼 고정된 값에 사용 |
-| `real_time_refresh` | Input | 값 변경 시 `update_build_config()` 호출 | 다른 field show/required/options를 바꿀 때만 사용 |
+| `real_time_refresh` | Input | 이 입력값 변경을 UI 설정 재계산 이벤트로 표시 | `update_build_config()`에서 다른 field show/required/options를 바꿀 때만 사용 |
 | `dynamic`, `show` | Input | 조건부 field 표시 | 인증 방식에 따라 token field 표시 같은 경우 |
-| `tool_mode` | 일부 Input | Agent tool argument로 노출 | Agent가 채워도 되는 값에만 사용 |
+| `tool_mode` | 일부 Input | Agent가 tool 호출 시 채울 argument로 노출 | 질문, route, limit처럼 Agent가 판단해 넣을 값에만 사용 |
 | `types` | `Output` | output port 타입 힌트 | 반환 객체와 맞게 `["Data"]`, `["Message"]`, `["DataFrame"]` |
 | `method` | `Output` | 실행할 method 이름 | 실제 method 이름과 정확히 일치해야 함 |
 
@@ -370,10 +370,12 @@ Langflow 버전에 따라 class 이름이나 위치가 다를 수 있으므로, 
 | `advanced` | 고급 영역으로 숨김 | timeout, debug, limit, status filter 등 |
 | `input_types` | 연결 가능한 포트 타입 | `DataInput`에서는 `["Data", "JSON"]` 자주 사용 |
 | `is_list` | list 입력 여부 | 여러 documents/tools를 받을 때 |
-| `tool_mode` | Agent tool argument로 노출 | Agent가 직접 채워야 하는 값에만 |
+| `tool_mode` | Agent tool argument로 노출 | 질문, route, limit처럼 Agent가 직접 채워야 하는 값에만 |
 | `dynamic` | 동적 field 여부 | 조건부 표시 |
-| `real_time_refresh` | 변경 즉시 config 갱신 | dropdown이 다른 field를 바꿀 때 |
+| `real_time_refresh` | 이 field 변경을 UI 설정 재계산 trigger로 만듦 | dropdown이 다른 field를 보이거나 숨길 때 |
 | `options` | dropdown 선택지 | `DropdownInput`에서 사용 |
+
+`real_time_refresh=True`는 node 실행 함수가 다시 실행된다는 뜻이 아니다. 사용자가 그 field 값을 바꿀 때 Langflow UI가 `update_build_config(build_config, field_value, field_name)` hook을 호출하도록 표시하는 옵션이다. 이 hook 안에서는 다른 입력의 `show`, `required`, `advanced`, `options` 같은 UI 설정만 가볍게 바꾸고, 외부 API 호출이나 대용량 파일 처리처럼 비용이 큰 작업은 실행 method 안에서 처리한다.
 
 좋은 예:
 
@@ -688,6 +690,34 @@ def _branch(self, expected_route: str) -> Data:
 
 downstream merger는 `active=True`이고 `skipped=False`인 branch만 선택한다.
 
+route 값별 flow 예시는 다음처럼 읽는다.
+
+| route 값 | 활성 output | 다음 flow | 예시 질문 |
+| --- | --- | --- | --- |
+| `data_retrieval` | `Route Gate.data_retrieval` | API/DB/CSV 조회, DataFrame 분석, Parser/Prompt 답변 | `defect_rate가 가장 높은 lot을 찾아줘` |
+| `document_rag` | `Route Gate.document_rag` | Milvus/Vector Store 검색, 문서 근거 prompt, LLM 답변 | `RAG 운영 기준을 알려줘` |
+| `final_answer` | `Route Gate.final_answer` | 조회 없이 final prompt 또는 질문 보정 답변 | `실습 순서를 간단히 알려줘` |
+
+분기 flow를 처음 만들 때는 세 output을 곧바로 API/DB/LLM에 연결하지 말고, 먼저 각각 `Chat Output`에 연결해서 active/skipped payload를 눈으로 확인한다. 그 다음 실제 branch 첫 노드로 교체한다.
+
+branch 첫 노드는 inactive payload를 받으면 외부 호출을 하지 않아야 한다.
+
+```python
+payload = _payload_from_value(self.branch_payload)
+
+if payload.get("skipped") is True or payload.get("active") is False:
+    return Data(data={
+        "success": False,
+        "active": False,
+        "skipped": True,
+        "reason": "inactive branch",
+        "rows": [],
+        "errors": [],
+    })
+
+# active branch에서만 API, DB, Milvus, LLM 호출을 실행한다.
+```
+
 ## 8. Payload contract
 
 Custom node flow에서 가장 중요한 것은 payload key를 안정적으로 유지하는 것이다.
@@ -851,6 +881,7 @@ traceback 전체
 ## 11. Dynamic field
 
 입력값에 따라 다른 field를 보이거나 숨기려면 `dynamic=True`, `real_time_refresh=True`, `update_build_config`를 사용한다.
+핵심은 `real_time_refresh=True`가 붙은 field가 바뀔 때 Langflow UI가 `update_build_config()`를 호출하고, 그 안에서 다른 field의 표시 여부를 바꾸는 구조라는 점이다.
 
 예: auth type에 따라 API key field 표시.
 
@@ -894,7 +925,12 @@ dynamic field는 편리하지만 너무 많이 쓰면 교육과 운영이 어려
 
 ## 12. Tool Mode와 Agent tool
 
-Langflow Agent가 custom component를 tool로 호출하려면 tool argument가 될 input에 `tool_mode=True`를 붙인다.
+Tool Mode는 모든 custom component에 붙이는 기본 옵션이 아니다.
+고정된 순서로 항상 실행되는 flow라면 일반 node 연결만으로 충분하다.
+반대로 Agent가 사용자의 질문을 보고 "이 component를 tool처럼 호출할지 말지" 판단해야 한다면, Agent가 직접 채워야 하는 input에 `tool_mode=True`를 붙인다.
+
+예를 들어 "생산 데이터셋 설명을 찾아줘"라는 질문에서 Agent가 `dataset_key="production"` 값을 직접 넣어 catalog tool을 호출해야 한다면 `dataset_key`가 tool argument가 된다.
+API key, DB URI, debug toggle, 대용량 payload처럼 사람이 미리 설정하거나 숨겨야 하는 값은 tool argument로 노출하지 않는다.
 
 ```python
 MessageTextInput(
@@ -2952,9 +2988,240 @@ class MyCustomNode(Component):
         return Data(data=result, text=json.dumps(result, ensure_ascii=False, default=str))
 ```
 
-## 30. 공식 참고 문서
+## 30. MCP client/server 활용 패턴
+
+MCP(Model Context Protocol)는 AI/Agent가 외부 도구, 데이터, 업무 flow를 호출하기 위한 공통 연결 규칙이다. 초보자 관점에서는 "Agent가 쓸 수 있는 tool을 표준 방식으로 꽂아 주는 방법"으로 이해하면 된다.
+
+- `MCP server`: tool을 제공하는 쪽이다. 예: web fetch server, 사내 mail server, Langflow project MCP server.
+- `MCP client`: MCP server에 연결해 tool 목록을 가져오고 실행하는 쪽이다. Langflow에서는 `MCP Tools` component가 이 역할을 한다.
+- `MCP tool`: Agent가 호출할 수 있는 하나의 기능이다. 예: `fetch_url`, `create_email_draft`, `company_faq_answer`.
+- Langflow에서 MCP는 flow logic을 대신 만드는 기능이 아니라, Agent와 외부 tool 또는 다른 Langflow flow 사이의 연결 경계를 표준화하는 기능이다.
+
+Langflow의 MCP 사용은 두 방향으로 나눠서 이해한다.
+
+| 방향 | 의미 | Langflow에서 하는 일 |
+| --- | --- | --- |
+| Langflow as MCP client | 외부 MCP server의 tool을 Langflow Agent가 사용 | `Settings > MCP Servers` 또는 MCP sidebar에서 server 등록 후 `MCP Tools.Toolset -> Agent.Tools` 연결 |
+| Langflow as MCP server | Langflow project/flow를 외부 MCP client가 호출하는 tool로 제공 | Project의 `MCP Server` tab 또는 `Share > MCP Server`에서 노출할 flow 선택 |
+
+### 30.1 외부 MCP tool을 Langflow Agent에 붙이는 법
+
+기본 연결은 다음 순서다.
+
+```text
+Chat Input.Message
+  -> Agent.Input
+
+MCP Tools(Web Fetch).Toolset
+  -> Agent.Tools
+
+MCP Tools(Mail Draft).Toolset
+  -> Agent.Tools
+
+Agent.Message
+  -> Chat Output.input
+```
+
+실습 예시는 웹 페이지를 읽고 메일 초안을 만드는 flow다.
+
+1. `Settings > MCP Servers` 또는 좌측 MCP sidebar에서 web fetch MCP server를 등록한다.
+   - STDIO 예: command `uvx`, args `mcp-server-fetch`
+2. 사내 mail MCP server를 등록한다.
+   - 교육 단계에서는 실제 발송 tool보다 `create_draft` 또는 `preview_email` tool을 우선한다.
+3. canvas에 `MCP Tools` component를 두 개 추가한다.
+4. 각 component의 `Tool` field에서 사용할 tool을 하나씩 고른다.
+5. 두 `MCP Tools`의 `Toolset` output을 Agent의 `Tools` input에 연결한다.
+6. Playground에서 URL, 수신자, 요약 기준을 넣고 초안 생성만 먼저 확인한다.
+
+Agent instruction 예:
+
+```text
+URL 내용을 fetch tool로 읽고 핵심을 5줄 이내로 요약한다.
+메일 제목과 본문 초안을 만든다.
+사용자가 "전송 승인"이라고 말하기 전에는 send_email tool을 호출하지 않는다.
+교육 실습에서는 create_draft 또는 preview_email tool만 사용한다.
+```
+
+### 30.2 만든 flow를 MCP server로 제공하는 법
+
+Langflow project는 MCP server로 노출될 수 있고, 선택한 flow들은 MCP tool처럼 보인다.
+이때 flow에는 `Chat Output` component가 있어야 한다.
+
+기본 절차:
+
+1. 외부에서 호출할 flow를 만든다.
+2. `Chat Input`과 `Chat Output`을 연결해 Playground에서 정상 답변을 확인한다.
+3. Project page의 `MCP Server` tab 또는 flow의 `Share > MCP Server`를 연다.
+4. `Edit Tools`에서 노출할 flow만 선택한다.
+5. tool name과 description을 업무명으로 바꾼다.
+   - 나쁜 이름: flow UUID
+   - 좋은 이름: `web_digest_email_draft`
+   - 좋은 설명: `Read a web page, summarize it, and create an email draft without sending.`
+6. 외부 MCP client에 project endpoint를 등록한다.
+
+Endpoint 예:
+
+```text
+# Project-specific MCP server
+http://localhost:7860/api/v1/mcp/project/PROJECT_ID/streamable
+
+# Global MCP server
+http://localhost:7860/api/v1/mcp/streamable
+
+# Langflow Desktop은 환경에 따라 기본 URL을 확인한다.
+http://localhost:7868/
+```
+
+운영 팁:
+
+- MCP tool이 너무 많으면 Agent가 잘못 고를 수 있으므로 project별로 노출 flow를 줄인다.
+- tool description은 "무엇을 입력받고 무엇을 반환하는지"까지 쓴다.
+- API key, Authorization header, mail token은 MCP server 설정이나 환경 변수로 관리하고 prompt에 쓰지 않는다.
+- 메일/삭제/결제처럼 외부 side effect가 있는 tool은 draft/preview와 send를 분리한다.
+- Langflow flow 안에서 다른 MCP server를 호출한 뒤 그 flow를 다시 MCP server로 공개할 수 있다. 이때 인증 header 전달 규칙을 별도로 확인한다.
+
+### 30.3 예시 구현 Flow 1: 외부 MCP 가져와 사용하기
+
+목표: 외부 web fetch MCP server와 사내 mail MCP server를 Langflow Agent에 붙여, URL 내용을 읽고 메일 초안을 만든다.
+
+구현 flow:
+
+```text
+Chat Input.Message
+  -> Agent.Input
+
+MCP Tools - Web Fetch.Toolset
+  -> Agent.Tools
+
+MCP Tools - Mail Draft.Toolset
+  -> Agent.Tools
+
+Agent.Message
+  -> Chat Output.input
+```
+
+필요 MCP server:
+
+```json
+{
+  "mcpServers": {
+    "web_fetch": {
+      "command": "uvx",
+      "args": ["mcp-server-fetch"]
+    },
+    "company_mailer": {
+      "url": "https://mcp.company.example/streamable",
+      "headers": {
+        "Authorization": "Bearer ${COMPANY_MAIL_MCP_TOKEN}"
+      }
+    }
+  }
+}
+```
+
+Agent instruction 핵심:
+
+```text
+URL을 fetch tool로 읽고 5줄 이내로 요약한다.
+메일 제목과 본문 초안을 만든다.
+사용자가 "전송 승인"이라고 말하기 전에는 send_email tool을 호출하지 않는다.
+교육 실습에서는 create_draft 또는 preview_email tool만 사용한다.
+```
+
+검증 질문:
+
+```text
+https://docs.langflow.org/mcp-client 페이지를 읽고 핵심만 5줄로 요약해서 training-review@example.com에게 보낼 메일 초안을 만들어줘. 아직 전송하지 말고 초안만 보여줘.
+```
+
+성공 기준:
+
+- Agent가 fetch tool을 호출한다.
+- 메일 제목과 본문 초안이 생성된다.
+- 전송 상태가 `draft_only`로 남는다.
+- 실제 `send_email`은 호출하지 않는다.
+
+### 30.4 예시 구현 Flow 2: Langflow flow를 MCP로 만들고 다른 flow에서 쓰기
+
+목표: 사내 FAQ/RAG flow를 MCP tool로 공개하고, 다른 Langflow Agent flow에서 그 tool을 호출한다.
+
+Producer flow:
+
+```text
+Chat Input.Message
+  -> Prompt Template.question
+
+File Dataset Loader 또는 Retriever.Data
+  -> Prompt Template.context
+
+Prompt Template.Message
+  -> Language Model.Input
+
+Language Model.Model Response
+  -> Chat Output.input
+```
+
+주의: Langflow flow를 MCP tool로 공개하려면 `Chat Output` component가 있어야 한다.
+
+MCP tool 공개 설정:
+
+```text
+Tool name:
+company_faq_answer
+
+Tool description:
+Answer questions about the internal Langflow study material using the company FAQ/RAG flow.
+Use this tool for custom components, Route Gate branching, MCP integration, Milvus RAG,
+and training sample files.
+```
+
+Consumer flow:
+
+```text
+Chat Input.Message
+  -> Agent.Input
+
+MCP Tools - Langflow Study Tools.Toolset
+  -> Agent.Tools
+
+Agent.Message
+  -> Chat Output.input
+```
+
+Consumer가 등록할 MCP server 예:
+
+```json
+{
+  "mcpServers": {
+    "langflow_study_tools": {
+      "url": "http://localhost:7860/api/v1/mcp/project/PROJECT_ID/streamable",
+      "headers": {
+        "x-api-key": "${LANGFLOW_PROJECT_MCP_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+검증 질문:
+
+```text
+사내 Langflow 교육 FAQ tool을 사용해서 Route Gate branch 처리 기준을 알려줘.
+```
+
+성공 기준:
+
+- Consumer Agent가 `company_faq_answer` MCP tool을 호출한다.
+- Producer flow 단독 실행 결과와 같은 근거를 포함한다.
+- tool 이름/설명이 명확해서 Agent가 다른 tool과 혼동하지 않는다.
+
+## 31. 공식 참고 문서
 
 - [Create custom Python components](https://docs.langflow.org/components-custom-components)
 - [Components overview](https://docs.langflow.org/concepts-components)
 - [Configure tools for agents](https://docs.langflow.org/agents-tools)
+- [Use Langflow as an MCP client](https://docs.langflow.org/mcp-client)
+- [Use Langflow as an MCP server](https://docs.langflow.org/mcp-server)
+- [Langflow MCP Client for coding agents](https://docs.langflow.org/langflow-mcp-client)
+- [Model Context Protocol introduction](https://modelcontextprotocol.io/docs/getting-started/intro)
 - [Dynamic Create Data](https://docs.langflow.org/dynamic-create-data)

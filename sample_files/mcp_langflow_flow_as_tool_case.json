@@ -1,0 +1,150 @@
+{
+  "case_id": "mcp-langflow-flow-as-tool-001",
+  "title": "Langflow flow exposed as MCP tool and reused by another Langflow flow",
+  "goal": "사내 FAQ/RAG flow를 Langflow MCP server로 공개한 뒤, 다른 Langflow flow의 Agent가 MCP Tools component로 가져와 호출하는 구조를 검증한다.",
+  "flow_type": "langflow_flow_exposed_as_mcp_and_used_by_another_flow",
+  "producer_flow": {
+    "name": "Company FAQ Answer Flow",
+    "purpose": "Langflow 교육자료 FAQ와 RAG 샘플을 근거로 질문에 답한다.",
+    "required_condition": "MCP tool로 공개하려면 Chat Output component가 있어야 한다.",
+    "nodes": [
+      {
+        "id": "producer_chat_input",
+        "display_name": "Chat Input",
+        "role": "FAQ/RAG 질문을 받는다.",
+        "output": "Message"
+      },
+      {
+        "id": "producer_retriever",
+        "display_name": "File Dataset Loader or Retriever",
+        "role": "company_faq_rag.json 또는 Milvus collection에서 관련 근거를 찾는다.",
+        "output": "Data"
+      },
+      {
+        "id": "producer_prompt",
+        "display_name": "Prompt Template",
+        "role": "질문과 근거를 답변 prompt로 합친다.",
+        "output": "Message"
+      },
+      {
+        "id": "producer_model",
+        "display_name": "Language Model",
+        "role": "근거 기반 답변을 생성한다.",
+        "output": "Message"
+      },
+      {
+        "id": "producer_chat_output",
+        "display_name": "Chat Output",
+        "role": "MCP tool이 반환할 최종 답변을 표시한다.",
+        "input": "Message"
+      }
+    ],
+    "connections": [
+      {
+        "from": "Chat Input.Message",
+        "to": "Prompt Template.question",
+        "type": "Message -> Text/Message"
+      },
+      {
+        "from": "File Dataset Loader or Retriever.Data",
+        "to": "Prompt Template.context",
+        "type": "Data -> Text/Message"
+      },
+      {
+        "from": "Prompt Template.Message",
+        "to": "Language Model.Input",
+        "type": "Message -> Message"
+      },
+      {
+        "from": "Language Model.Model Response",
+        "to": "Chat Output.input",
+        "type": "Message -> Message"
+      }
+    ],
+    "mcp_tool_settings": {
+      "tool_name": "company_faq_answer",
+      "tool_description": "Answer questions about the internal Langflow study material using the company FAQ/RAG flow. Use this for custom components, Route Gate branching, MCP integration, Milvus RAG, and training sample files."
+    },
+    "producer_playground_question": "Route Gate에서 선택되지 않은 branch는 어떻게 처리해야 해?",
+    "producer_expected_answer": "선택되지 않은 branch는 success=false, active=false, skipped=true로 반환하고 downstream은 active=true이며 skipped=false인 branch만 처리해야 한다."
+  },
+  "mcp_server_registration": {
+    "where": "Producer project > MCP Server tab 또는 flow Share > MCP Server",
+    "endpoint": "http://localhost:7860/api/v1/mcp/project/PROJECT_ID/streamable",
+    "desktop_note": "Langflow Desktop은 환경에 따라 http://localhost:7868/ 주소를 확인한다.",
+    "auth": {
+      "recommended": true,
+      "header_name": "x-api-key",
+      "header_value_example": "${LANGFLOW_PROJECT_MCP_API_KEY}"
+    }
+  },
+  "consumer_flow": {
+    "name": "Study Assistant Flow",
+    "purpose": "업무 Agent가 필요할 때 Producer flow를 MCP tool로 호출해 공통 FAQ 답변을 재사용한다.",
+    "nodes": [
+      {
+        "id": "consumer_chat_input",
+        "display_name": "Chat Input",
+        "role": "사용자의 업무 질문을 받는다.",
+        "output": "Message"
+      },
+      {
+        "id": "consumer_mcp_tools",
+        "display_name": "MCP Tools - Langflow Study Tools",
+        "role": "Producer project MCP endpoint에서 company_faq_answer tool을 가져온다.",
+        "output": "Toolset"
+      },
+      {
+        "id": "consumer_agent",
+        "display_name": "Agent",
+        "role": "FAQ 관련 질문이면 company_faq_answer tool을 호출한다.",
+        "output": "Message"
+      },
+      {
+        "id": "consumer_chat_output",
+        "display_name": "Chat Output",
+        "role": "tool 호출 결과를 포함한 최종 답변을 표시한다.",
+        "input": "Message"
+      }
+    ],
+    "connections": [
+      {
+        "from": "Chat Input.Message",
+        "to": "Agent.Input",
+        "type": "Message -> Message"
+      },
+      {
+        "from": "MCP Tools - Langflow Study Tools.Toolset",
+        "to": "Agent.Tools",
+        "type": "Toolset -> Tools"
+      },
+      {
+        "from": "Agent.Message",
+        "to": "Chat Output.input",
+        "type": "Message -> Message"
+      }
+    ],
+    "consumer_playground_question": "사내 Langflow 교육 FAQ tool을 사용해서 Route Gate branch 처리 기준을 알려줘.",
+    "consumer_expected_answer": "Agent가 company_faq_answer MCP tool을 호출하고, Producer flow와 같은 기준인 active/skipped payload 처리와 downstream guard를 설명한다."
+  },
+  "mcp_server_config_for_consumer": {
+    "mcpServers": {
+      "langflow_study_tools": {
+        "url": "http://localhost:7860/api/v1/mcp/project/PROJECT_ID/streamable",
+        "headers": {
+          "x-api-key": "${LANGFLOW_PROJECT_MCP_API_KEY}"
+        }
+      }
+    }
+  },
+  "failure_tests": [
+    {
+      "input": "Producer flow에 Chat Output이 없는 상태로 MCP tool로 노출한다.",
+      "expected": "Flow를 MCP tool로 사용할 수 없으므로 Chat Output을 추가해야 한다."
+    },
+    {
+      "input": "Consumer Agent가 tool을 고르지 못한다.",
+      "expected": "MCP Server의 Edit Tools에서 tool name과 description을 더 명확히 수정하고, MCP Tools component의 Tool field에서 company_faq_answer만 선택한다."
+    }
+  ]
+}

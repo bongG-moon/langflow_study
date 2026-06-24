@@ -39,6 +39,20 @@
       ]
     },
     {
+      "id": "json-rag-003",
+      "file": "company_faq_rag.json",
+      "flow": "Route Gate -> Data Retrieval branch / Document RAG branch / Final Answer branch",
+      "question": "route 값이 data_retrieval, document_rag, final_answer일 때 각각 어떤 흐름으로 가야 해?",
+      "expected_answer": "data_retrieval은 API/DB/CSV 같은 정형 데이터 조회 branch로 보내고, document_rag는 Milvus 또는 Vector Store 기반 문서 검색 branch로 보낸다. final_answer는 추가 조회 없이 final prompt 또는 질문 보정 답변 branch로 보낸다. 처음에는 세 output을 각각 Chat Output에 연결해 active/skipped payload를 확인한다.",
+      "must_include": [
+        "data_retrieval",
+        "document_rag",
+        "final_answer",
+        "Chat Output",
+        "active"
+      ]
+    },
+    {
       "id": "csv-analysis-001",
       "file": "quality_inspection_metrics.csv",
       "flow": "File Dataset Loader or CSV -> Safe DataFrame Profiler -> LLM",
